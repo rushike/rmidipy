@@ -1,4 +1,9 @@
 import math, re
+import numpy
+import hashlib as ha
+
+hash_ =  ha.md5()
+
 WRAP_DATA = 0x7f
 WRAP_BITS = 7
 
@@ -120,3 +125,30 @@ def hexstr(bnum: bytearray, leng = 0, group = 0, numlen = 2, ftype = 0):
 def dtime(delta_time, time_div):
     if not delta_time: return 0
     return int((time_div * 4) // delta_time)
+
+
+def file_hash(f, hexst = False):
+    with open(f, "rb") as fi:
+        cont = fi.read()
+        return ha.md5(cont).hexdigest()
+    return hash_.hexdigest()
+
+def midi_to_note(noteval):
+    if not numpy.isscalar(noteval): return [midi_to_note(v) for v in noteval]
+
+    if not 20 < noteval < 128: raise ValueError('Noteval not in range : {}'.format(noteval))
+    
+    mod = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
+    
+    note = mod[noteval % 12]
+    octave = noteval // 12 - 1
+    return '{}{}'.format(note, octave)
+
+def note_to_midi(note):
+    val_notes = {'c' : 0, 'c#' : 1, 'd' : 2, 'd#': 3, 'e': 4, 'f': 5, 'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}
+    if not numpy.isscalar(note): return [note_to_midi(v) for v in note]
+    
+    if note[:2].lower() not in val_notes: raise ValueError('Invalid Note String {}'.format(note))
+
+    note, octave = note[:2], note[2:]
+

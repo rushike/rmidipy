@@ -167,8 +167,10 @@ class Constant:
 
 
 class MIDI:
-    def __init__(self, format_type = 0, track_count = 0, time_div = 0x1e0, empty = False):
+    def __init__(self,  format_type = 0, track_count = 0, time_div = 0x1e0, empty = False, filename = None, ):
         # return super().__init__(*args, **kwargs)
+        self.pipe = {}
+        self.filename = filename
         self.format_type = format_type
         self.track_count = track_count
         self.time_div = time_div
@@ -178,16 +180,32 @@ class MIDI:
     def track(self, track_no):#Indexing from Zero
         if self.track_count < track_no : raise IndexError("Track no out of range")
         return self.tracks[track_no]
+    def set_tempo(self, val, inbpm = True): 
+        """val acts as actual bpm value if inbpm is True, 
+         or as no ticks per seconds count if inbpm is False
+        
+        Arguments:
+            self {[type]} -- [description]
+        
+        Keyword Arguments:
+            inbpm {bool} -- [description] (default: {True})
+        """
+        val = (val * .5e6 ) // 7200 if inbpm else val 
+        self.pipe['ntime_div']  = val
+        self.time_div = val
+
     def to_byte_array(self):
         byte_list = self.__midiheaderbytes()
+
         for trk in self.tracks:
-            # print("trks : ", trk.trk_event)
             byte_list.extend(trk.to_byte_array())
         return byte_list
     
     def create_file(self, file_name, loc = pathmap.abspath(os.curdir)):
         with open(loc + "/" + file_name + ".mid", "wb+") as f:
-            f.write(self.to_byte_array())
+            df = self.to_byte_array()
+
+            f.write(df)
 
     @classmethod
     def parse_midi(cls, filename):
@@ -199,11 +217,13 @@ class MIDI:
 
     @classmethod
     def parser(cls, content):
+        
         vmthd = content[:4]
         vlength = mutils.toint(content[4:8])
         vformat_type = mutils.toint(content[8:10])
         vtrack_count = mutils.toint(content[10:12])
         vtime_div = mutils.toint(content[12:14])
+
         mid = cls(vformat_type, vtrack_count, vtime_div, empty = True)
         utape = 14
         for t in mid.tracks:
@@ -212,6 +232,7 @@ class MIDI:
             utape += (lentr + 8)
             trkip = content[utape - lentr : utape]
             leny = len(trkip)
+            if leny == 0: break
             trk_elist = []
             to, fr = 0, 0 #Start state
             tape = -1 #Start at far left
@@ -309,10 +330,13 @@ class MIDI:
             t.__reinit__(id, len(trk_elist), trk_elist, mid)
         # print(mid)
         return mid
+    def decompress(self):
+        if self.filename is not None:
+            return MIDI.parse_midi(self.filename)
 
     def compress(self, filename = 'default'):
         bytelist = self.__midiheaderbytes()
-        print("H : ", mutils.hexstr(bytelist))
+        # print("H : ", mutils.hexstr(bytelist))
         ch_active = False
         for t in self.tracks:
             bytelist.extend(Constant.Mtrk)
@@ -341,6 +365,11 @@ class MIDI:
         byte_list.extend(mutils.to_fix_length(self.track_count, 2, 8))
         byte_list.extend(mutils.to_fix_length(self.time_div, 2, 8))
         return byte_list
+    
+    def __refresh__(self):
+        for t in self.tracks:
+            pass
+
     def __repr__(self):
         st = ""
         for t in self.tracks:
@@ -485,6 +514,41 @@ class MIDI:
             for i in range(4, 8):
                 byte_list.insert(i, le[i - 4])
             return byte_list
+
+        def notes(self, abs = True, eventtype = None):
+            dictn = {}
+            res = []
+            timekeeper = 0 #in microsecods
+            for t in self.trk_event:
+
+                if 0x80 <= t.event_id < 0xa0:   
+                    eventid = t.event_id >> 4
+                    noteval = t.data[0]
+                    velocity = t.data[1] 
+                    to = 0
+                    #DFA Inside
+                    if to == 0:#Delta time == 0
+                        to = 1 
+                    if to == 1: #check if closing the node
+                        if eventid  & 0xf == 8 or velocity == 0: to = 3
+                        else : to = 2
+                    if to == 2: # push the current time
+                        timekeeper += t.delta_time
+                        dictn[noteval] = timekeeper
+                        to = -1
+                    if to == 3: # assign the duration
+                        duration = timekeeper - dictn[noteval]
+                        to = 4
+                    if to == 4: # store in res
+                        res.append((timekeeper, noteval, duration))
+                else : pass
+
+            return res    
+        def __refresh__(self):
+            for t in self.trk_event:
+                pass
+
+
         def __repr__(self):
             st = ""
             for e in self.trk_event:
@@ -506,11 +570,14 @@ class MIDI:
             def set_date_params(self, params):
                 self.data = bytearray(params)
 
+            def scale_delta_time(self, factor):
+                self.delta_time = self.delta_time * factor
+
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):
                 evti = mutils.ch_event_id(event_id, channel_no) if channel_no is not None else event_id 
-                print("Ch event  evti : ", evti, ", None : ", channel_no is None)
+                # print("Ch event  evti : ", evti, ", None : ", channel_no is None)
                 evt = cls(delta_time, Constant.CHANNEL_EVENT, evti)
                 evt.data = bytearray(params)
                 return evt
@@ -536,7 +603,7 @@ class MIDI:
                 byte_list.extend(mutils.to_var_length(self.delta_time))
                 byte_list.append(self.event_id)
                 if self.etype == Constant.CHANNEL_EVENT:
-                    print("ch : ", self.event_id)
+                    # print("ch : ", self.event_id)
                     # byte_list.pop()
                     # evti = mutils.ch_event_id(self.event_id, self.channel_no)
                     # byte_list.append(evti)

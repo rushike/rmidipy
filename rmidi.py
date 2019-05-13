@@ -13,13 +13,13 @@ class Muse:
             while 60 < seq[i] and seq[i] > 88: 
                 seq[i] += 48
                 seq[i] = seq[i] % modulo
-            print("seq : ", seq[i])
+            # print("seq : ", seq[i])
 
         return seq
     def muse(self, dtime, notes, time_div = 0x1e0):
         m = MIDI(format_type= 1, track_count = 1, time_div=time_div)
         for i in range(len(dtime)):
-            print("tm, nt = ", dtime[i], notes[i])
+            # print("tm, nt = ", dtime[i], notes[i])
             m.track(0).add_event(0, 'note_on', note_number = notes[i], velocity = 90, channel_no = 0)
             m.track(0).add_event(dtime[i], 'note_on', note_number = notes[i], velocity = 0, channel_no = 0)
         return m
