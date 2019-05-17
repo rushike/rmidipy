@@ -68,3 +68,31 @@ Testing the set_tempo of MIDI
 
 # x.compress('tempo_change')
 
+
+"""
+Sieve Erothenes 
+"""
+
+# import numpy, math
+# def such(n):
+#     nums = numpy.zeros(1000000, dtype = numpy.int32)
+#     primes = [2]
+#     i = 0
+#     while primes[i] < math.sqrt(1000000) :
+#         for j in range( primes[i], 1000000, primes[i]):
+#             if nums[j] == 0:  nums[j] = primes[i]
+#         for j in range(primes[i] + 1, 2 * primes[i]):
+#             if nums[j] == 0:
+#                 primes.append(j)
+#                 break
+#         i += 1
+#     nums
+#     return nums
+
+# a = such(10)
+# unique, counts = numpy.unique(a, return_counts=True)
+# dct = dict(zip(unique, counts))
+# n = 11
+# pp = dct[n]
+
+# print(pp)

@@ -518,9 +518,10 @@ class MIDI:
         def notes(self, abs = True, eventtype = None):
             dictn = {}
             res = []
+            res_bpm = [(0, 500000),]
             timekeeper = 0 #in microsecods
             for t in self.trk_event:
-
+                timekeeper += (t.delta_time / self.midi_.time_div * res_bpm[-1][1])
                 if 0x80 <= t.event_id < 0xa0:   
                     eventid = t.event_id >> 4
                     noteval = t.data[0]
@@ -533,17 +534,21 @@ class MIDI:
                         if eventid  & 0xf == 8 or velocity == 0: to = 3
                         else : to = 2
                     if to == 2: # push the current time
-                        timekeeper += t.delta_time
                         dictn[noteval] = timekeeper
                         to = -1
                     if to == 3: # assign the duration
                         duration = timekeeper - dictn[noteval]
                         to = 4
                     if to == 4: # store in res
-                        res.append((timekeeper, noteval, duration))
-                else : pass
+                        res.append(((timekeeper - duration)/1e6, noteval, duration/1e6))
+                        
+                elif t.event_id == 0xff and t.meta_event_type == 0x51:
+                    microsecods = t.get_data()
+                    if (timekeeper, microsecods) not in res_bpm: res_bpm += [(timekeeper, microsecods)]
+                
+                
 
-            return res    
+            return {'note_series ' : res, 'bpm_change' : res_bpm}    
         def __refresh__(self):
             for t in self.trk_event:
                 pass
@@ -573,6 +578,8 @@ class MIDI:
             def scale_delta_time(self, factor):
                 self.delta_time = self.delta_time * factor
 
+            def get_data(self, asnum = True, msb = True):
+                return mutils.toint(self.data, 8)
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):
