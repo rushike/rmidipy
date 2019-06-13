@@ -586,6 +586,16 @@ class MIDI:
 
             def get_data(self, asnum = True, msb = True):
                 return mutils.toint(self.data, 8)
+            
+            def is_channel_event(self):
+                return self.etype == Constant.CHANNEL_EVENT
+
+            def is_meta_event(self):
+                return self.etype == Constant.META_EVENT
+
+            def is_sys_event(self):
+                return self.etype == Constant.SYS_EVENT
+
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):
@@ -598,7 +608,7 @@ class MIDI:
             
             @classmethod
             def MetaEvent(cls, delta_time, meta_event_type, params = ()):
-                evt = cls(delta_time,Constant.META_EVENT, 0xff, meta_event_type & 0xff)
+                evt = cls(delta_time, Constant.META_EVENT, 0xff, meta_event_type & 0xff)
                 if params is None : return evt
                 elif type(params) == str :                    
                     evt.data = params.encode('utf-8')
