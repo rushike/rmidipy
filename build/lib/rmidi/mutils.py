@@ -10,6 +10,8 @@ WRAP_BITS = 7
 def ch_event_id(id, no) :
     return ((id & 0xf) << 4) | (no & 0xf)
 
+def channel(evt_id):
+    return (evt_id >> 4) & 0xf
 def numin(num, startb, off):#off length of bits that want
     return (num >> startb) & ((1 << off) - 1)
 
