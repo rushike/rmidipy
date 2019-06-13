@@ -1,6 +1,6 @@
-import mutils
-from rmidi import MIDI
-import rmidi
+from rmidi import mutils
+from rmidi.MIDI import MIDI
+from rmidi import rmidi 
 import numpy, random
 
 '''

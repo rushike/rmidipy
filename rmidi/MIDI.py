@@ -1,7 +1,7 @@
 import math, random, copy
 import numpy as np 
 import os, os.path as pathmap
-import mutils
+from rmidi import mutils
 import itertools
 
 WRAP_DATA = 0x7f

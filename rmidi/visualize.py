@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from rmidi import MIDI 
+from rmidi.MIDI import MIDI 
 
 f = "./midis/Believer_-_Imagine_Dragons.mid"
 

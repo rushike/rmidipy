@@ -1,6 +1,6 @@
-from MIDI import *
+from rmidi.MIDI import *
 import math, itertools
-import mutils
+from rmidi import mutils
 class Muse:
 
     def __init__(self, *args, **krgws):
