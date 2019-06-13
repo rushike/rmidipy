@@ -1,5 +1,9 @@
+MIDI.py
 README.md
+mutils.py
+rmidi.py
 setup.py
+sound.py
 rmidi.egg-info/PKG-INFO
 rmidi.egg-info/SOURCES.txt
 rmidi.egg-info/dependency_links.txt

@@ -5,7 +5,8 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rmidi",
-    version="0.0.1",
+    version="0.0.2",
+    scripts = ['MIDI.py', 'mutils.py', 'rmidi.py', 'sound.py'],
     author="rushike",
     author_email="rushike.ab1@gmail.com",
     description="Math Sequence to MIDI",
