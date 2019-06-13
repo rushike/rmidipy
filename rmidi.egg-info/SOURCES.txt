@@ -1,0 +1,6 @@
+README.md
+setup.py
+rmidi.egg-info/PKG-INFO
+rmidi.egg-info/SOURCES.txt
+rmidi.egg-info/dependency_links.txt
+rmidi.egg-info/top_level.txt

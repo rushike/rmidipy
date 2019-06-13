@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: rmidi
+Version: 0.0.1
+Summary: Math Sequence to MIDI
+Home-page: https://github.com/rushike/rmidipy
+Author: rushike
+Author-email: rushike.ab1@gmail.com
+License: UNKNOWN
+Description: # rmidipy
+        Math Sequence to midi, 
+        
+        The package will help in opening the midi files and geting modified it. 
+        
+        For now it is developing stage, The functionality implemented is only of opening and closing of midi file. With same can convert sequence to midi file
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
