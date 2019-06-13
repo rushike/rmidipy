@@ -6,10 +6,7 @@ import numpy, random
 '''
 MIDI Object Testinh
 '''
-
-import os
-
-y = MIDI.parse_midi('./midis/Believer_-_Imagine_Dragons.mid')
+y = MIDI.parse_midi('default.mid')
 
 tr = y.track(0)
 
@@ -21,11 +18,12 @@ y.compress('check')
 
 # y.create_file('check')
 
-e = mutils.file_hash('./midis/Believer_-_Imagine_Dragons.mid')
+e = mutils.file_hash('default.mid')
 
 d = mutils.file_hash('check.mid')
 
 print(e, ", ", d , " : ", e == d)
+
 
 
 '''

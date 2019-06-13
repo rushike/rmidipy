@@ -1,4 +1,4 @@
-import math, random, copy
+import math, random
 import numpy as np 
 import os, os.path as pathmap
 import mutils
@@ -174,7 +174,7 @@ class MIDI:
         self.format_type = format_type
         self.track_count = track_count
         self.time_div = time_div
-        self.tracks = [MIDI.Track(self, empty= empty) for _ in range(track_count)]
+        self.tracks = [MIDI.Track(self, empty= empty)] * track_count
         self.byte_list = bytearray()     
 
     def track(self, track_no):#Indexing from Zero
@@ -400,10 +400,9 @@ class MIDI:
         def __reinit__(self, id, length, trk_event, midi_):
             self.id = id
             self.length = length
-            trk_event_copy = copy.deepcopy(trk_event)
             # print("Trakc : ... ", trk_event)
             # print("Track Length : ", len(trk_event))
-            self.trk_event = [v for v in trk_event_copy]
+            self.trk_event = [v for v in trk_event]
             # print("Trak : ... ", self.trk_event)
             self.midi_ = midi_
 
@@ -486,11 +485,6 @@ class MIDI:
             end = self.trk_event.pop()
             self.trk_event.append(MIDI.Track.Event.ChannelEvent(self.delta_time(note_length), 0x9, channel_no, (note_val, intensity)))
             self.trk_event.append(end)
-        
-        def transpose(self, tval):
-            arr = self.notes()
-            return [(arr[0], arr[1] + tval, arr[2]) for v in arr]
-
 
         def close_note(self, note_length, note_val, channel_no):
             end = self.trk_event.pop()
@@ -554,7 +548,7 @@ class MIDI:
                 
                 
 
-            return {'note_series' : res, 'bpm_change' : res_bpm}    
+            return {'note_series ' : res, 'bpm_change' : res_bpm}    
         def __refresh__(self):
             for t in self.trk_event:
                 pass
