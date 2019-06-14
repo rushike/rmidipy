@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
-from rmidi.MIDI import MIDI
+from rmidi.MIDI import MIDI, Constant
 from rmidi.mutils import channel as mchannel
+from rmidi import mutils
 
 class Analyser:
     def __init__(self, midi_file, **kwargs):
         self.__midi = MIDI.parse_midi(midi_file)
         
-    def stats(self):
+    def stats(self, names = False):
         stat_freq = {'channel' : {8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0},
              'meta': {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 32: 0, 33: 0, 47: 0, 81: 0, 84: 0, 88: 0, 89: 0, 127: 0}, 
              'sys': {240: 0, 247: 0}
@@ -14,13 +15,22 @@ class Analyser:
         for t in self.__midi.tracks:
             for e in t.trk_event:
                 if e.is_channel_event():
-                    stat_freq['channel'][mchannel(e.evt_id)] += 1
+                    stat_freq['channel'][mchannel(e.event_id)] += 1
                 elif e.is_meta_event():
                     stat_freq['meta'][e.meta_event_type] += 1
                 elif e.is_meta_event():
                     stat_freq['sys'][e.event_id] += 1
                 else : raise AttributeError('invalid MIDI event or Event Id got is not supported by this version of rmidi ')
-        return stat_freq
+        if names:
+            c_stat_freq = dict()
+            evt_format = mutils.dictn(Constant.ch_event_format)
+            c_stat_freq['channel'] = {evt_format[k][0] : v for k, v in stat_freq['channel'].items()}
+            evt_format = mutils.dictn(Constant.meta_event_format)
+            c_stat_freq['meta'] = {evt_format[k][0] : v for k, v in stat_freq['meta'].items()}            
+            evt_format = mutils.dictn(Constant.sys_event_format)
+            c_stat_freq['sys'] = {evt_format[k][0] : v for k, v in stat_freq['sys'].items()}
+            return c_stat_freq
+        return stat_freq 
 
 
 
@@ -40,7 +50,7 @@ if __name__ == "__main__":
     # plt.plot(x, y)
     # plt.legend()
     # plt.show()
-    f = 'rmidi\default.mid'
+    f = 'midis\\Believer_Imagine_Dragons'
 
     c = Analyser(f)
 

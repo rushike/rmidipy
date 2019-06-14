@@ -7,6 +7,7 @@ hash_ =  ha.md5()
 WRAP_DATA = 0x7f
 WRAP_BITS = 7
 
+
 def ch_event_id(id, no) :
     return ((id & 0xf) << 4) | (no & 0xf)
 
@@ -155,3 +156,6 @@ def note_to_midi(note):
 
     note, octave = note[:2], note[2:]
 
+
+def dictn(ndlist):
+    return {l[0] : l[1:]  for l in ndlist}

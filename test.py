@@ -1,9 +1,10 @@
 from rmidi import mutils
 from rmidi.MIDI import MIDI
-from rmidi import rmidi 
+from rmidi import rmidix
 from rmidi import analyser
 import numpy, random
-
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
 '''
 MIDI Object Testinh
 '''
@@ -108,6 +109,28 @@ f = 'rmidi\default.mid'
 
 c = analyser.Analyser(f)
 
-g = c.stats()
+g = c.stats(True)
+
+np = numpy
+
+fig = plt.figure(tight_layout=True)
+gs = gridspec.GridSpec(2, 2)
+
+ax = fig.add_subplot(gs[0, :])
+ax.bar(g['channel'].keys(), g['channel'].values())
+ax.set_ylabel('frequency of occurence')
+ax.set_xlabel('channel event')
+v = ['meta', 'sys']
+for i in range(2):
+    ax = fig.add_subplot(gs[1, i])
+    ax.bar(g[v[i]].keys(), g[v[i]].values())
+    ax.set_ylabel('%s event' % v[i])
+    ax.set_xlabel('%s event' % v[i])
+    if i == 0:
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(55)
+fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+
+plt.show()
 
 c == g
