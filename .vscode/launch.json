@@ -8,7 +8,7 @@
             "name": "Python: Testing File",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/test.py",
+            "program": "${workspaceFolder}\\rmidi\\test.py",
             "console": "integratedTerminal"
         },
         {

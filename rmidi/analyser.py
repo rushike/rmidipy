@@ -20,23 +20,30 @@ class Analyser:
                 elif e.is_meta_event():
                     stat_freq['sys'][e.event_id] += 1
                 else : raise AttributeError('invalid MIDI event or Event Id got is not supported by this version of rmidi ')
-
+        return stat_freq
 
 
 
 if __name__ == "__main__":
-    f = "./midis/Believer_-_Imagine_Dragons.mid"
+    # f = "./midis/Believer_-_Imagine_Dragons.mid"
 
-    y = MIDI.parse_midi(f)
+    # y = MIDI.parse_midi(f)
 
-    t0 = y.track(0)
+    # t0 = y.track(0)
 
-    n = t0.notes()
-    nn = n["note_series"]
-    x = [v[0] for v in nn]
+    # n = t0.notes()
+    # nn = n["note_series"]
+    # x = [v[0] for v in nn]
 
-    y = [v[1] for v in nn]
+    # y = [v[1] for v in nn]
 
-    plt.plot(x, y)
-    plt.legend()
-    plt.show()
+    # plt.plot(x, y)
+    # plt.legend()
+    # plt.show()
+    f = 'rmidi\default.mid'
+
+    c = Analyser(f)
+
+    g = c.stats()
+
+    c == g

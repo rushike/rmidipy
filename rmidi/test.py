@@ -1,31 +1,32 @@
 from rmidi import mutils
 from rmidi.MIDI import MIDI
 from rmidi import rmidi 
+from rmidi import analyser
 import numpy, random
 
 '''
 MIDI Object Testinh
 '''
 
-import os
+# import os
 
-y = MIDI.parse_midi('./midis/Believer_-_Imagine_Dragons.mid')
+# y = MIDI.parse_midi('./midis/Believer_-_Imagine_Dragons.mid')
 
-tr = y.track(0)
+# tr = y.track(0)
 
-no = tr.notes()
+# no = tr.notes()
 
 
 
-y.compress('check')
+# y.compress('check')
 
-# y.create_file('check')
+# # y.create_file('check')
 
-e = mutils.file_hash('./midis/Believer_-_Imagine_Dragons.mid')
+# e = mutils.file_hash('./midis/Believer_-_Imagine_Dragons.mid')
 
-d = mutils.file_hash('check.mid')
+# d = mutils.file_hash('check.mid')
 
-print(e, ", ", d , " : ", e == d)
+# print(e, ", ", d , " : ", e == d)
 
 
 '''
@@ -98,3 +99,15 @@ Sieve Erothenes
 # pp = dct[n]
 
 # print(pp)
+
+
+'''
+Test Analyser
+'''
+f = 'rmidi\default.mid'
+
+c = analyser.Analyser(f)
+
+g = c.stats()
+
+c == g

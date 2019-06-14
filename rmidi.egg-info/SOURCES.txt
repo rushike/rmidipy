@@ -4,7 +4,7 @@ rmidi/MIDI.py
 rmidi/__init__.py
 rmidi/analyser.py
 rmidi/mutils.py
-rmidi/rmidi.py
+rmidi/rmidix.py
 rmidi/sound.py
 rmidi/test.py
 rmidi.egg-info/PKG-INFO
