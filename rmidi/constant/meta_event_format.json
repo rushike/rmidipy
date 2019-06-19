@@ -1,0 +1,184 @@
+{
+    "255": {
+        "id": 255,
+        "name": "meta",
+        "0": {
+            "type_id": 0,
+            "type_name": "sequence_number",
+            "length": 2,
+            "params": [
+                "nmsb",
+                "nlsb"
+            ],
+            "dtype": "int",
+            "mask": [
+                255,
+                255
+            ]
+        },
+        "1": {
+            "type_id": 1,
+            "type_name": "text_event",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "2": {
+            "type_id": 2,
+            "type_name": "copyright_notice",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "3": {
+            "type_id": 3,
+            "type_name": "track_name",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "4": {
+            "type_id": 4,
+            "type_name": "instrument_name",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "5": {
+            "type_id": 5,
+            "type_name": "lyrics",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "6": {
+            "type_id": 6,
+            "type_name": "marker",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "7": {
+            "type_id": 7,
+            "type_name": "cue_point",
+            "length": -1,
+            "params": "text",
+            "dtype": "str",
+            "mask": 127
+        },
+        "32": {
+            "type_id": 32,
+            "type_name": "midi_ch_prefix",
+            "length": 1,
+            "params": [
+                "channel"
+            ],
+            "dtype": "int",
+            "mask": [
+                15
+            ]
+        },
+        "33": {
+            "type_id": 33,
+            "type_name": "midi_port",
+            "length": 1,
+            "params": [
+                "port_no"
+            ],
+            "dtype": "int",
+            "mask": [
+                15
+            ]
+        },
+        "47": {
+            "type_id": 47,
+            "type_name": "end_of_track",
+            "length": 0,
+            "params": null,
+            "dtype": "None",
+            "mask": 127
+        },
+        "81": {
+            "type_id": 81,
+            "type_name": "set_tempo",
+            "length": 3,
+            "params": [
+                "musec_per_quat_note",
+                "musec_per_quat_note",
+                "musec_per_quat_note"
+            ],
+            "dtype": "int",
+            "mask": [
+                127,
+                127,
+                127
+            ]
+        },
+        "84": {
+            "type_id": 84,
+            "type_name": "smpte_offset",
+            "length": 5,
+            "params": [
+                "hr",
+                "min",
+                "sec",
+                "fr",
+                "subfr"
+            ],
+            "dtype": "int",
+            "mask": [
+                24,
+                60,
+                60,
+                30,
+                100
+            ]
+        },
+        "88": {
+            "type_id": 88,
+            "type_name": "time_sig",
+            "length": 4,
+            "params": [
+                "numer",
+                "denom",
+                "metro",
+                "32nds"
+            ],
+            "dtype": "int",
+            "mask": [
+                255,
+                255,
+                255,
+                255
+            ]
+        },
+        "89": {
+            "type_id": 89,
+            "type_name": "key_sig",
+            "length": 2,
+            "params": [
+                "key",
+                "scale"
+            ],
+            "dtype": "int",
+            "mask": [
+                15,
+                1
+            ]
+        },
+        "127": {
+            "type_id": 127,
+            "type_name": "sequence_specifier",
+            "length": -1,
+            "params": "text",
+            "dtype": "any",
+            "mask": 127
+        }
+    }
+}

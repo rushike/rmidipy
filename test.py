@@ -107,19 +107,30 @@ Test Analyser
 '''
 f = 'rmidi\default.mid'
 
-c = analyser.Analyser(f)
+# c = analyser.Analyser(f)
 
-g = c.stats(True)
+# g = c.stats(True)
+
+# g = analyser.Analyser.analyse_dataset('..\\dataset\\lakh_dataset', save='..\\dataset\\numpy', end = 1000)
 
 np = numpy
-
+g = np.load('F:\\rushikesh\\project\\dataset\\numpy\\_FST_1_END_1000_NUMPYSTORE_DATSET_lakh_dataset.npy')
+g = g.item()
+print(g)
+sm = 0
+for k, v in g['channel'].items():
+    sm += v
+print('\n\n-------------------------------------------------\n\npercent : ', (g['channel']['pitch_bend']/sm * 100))
+# g['channel']
 fig = plt.figure(tight_layout=True)
 gs = gridspec.GridSpec(2, 2)
 
 ax = fig.add_subplot(gs[0, :])
-ax.bar(g['channel'].keys(), g['channel'].values())
+cx , cy = list(g['channel'].keys()), list(g['channel'].values())
+ax.bar(cx[2:], cy[2:])
 ax.set_ylabel('frequency of occurence')
 ax.set_xlabel('channel event')
+# plt.show()
 v = ['meta', 'sys']
 for i in range(2):
     ax = fig.add_subplot(gs[1, i])
@@ -132,5 +143,3 @@ for i in range(2):
 fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
 
 plt.show()
-
-c == g

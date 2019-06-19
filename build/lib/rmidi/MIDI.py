@@ -217,117 +217,133 @@ class MIDI:
 
     @classmethod
     def parser(cls, content):
-        
-        vmthd = content[:4]
-        vlength = mutils.toint(content[4:8])
-        vformat_type = mutils.toint(content[8:10])
-        vtrack_count = mutils.toint(content[10:12])
-        vtime_div = mutils.toint(content[12:14])
+        try : 
+            vmthd = content[:4]
+            vlength = mutils.toint(content[4:8])
+            vformat_type = mutils.toint(content[8:10])
+            vtrack_count = mutils.toint(content[10:12])
+            vtime_div = mutils.toint(content[12:14])
 
-        mid = cls(vformat_type, vtrack_count, vtime_div, empty = True)
-        utape = 14
-        for t in mid.tracks:
-            vmtrk = content[utape: utape + 4]
-            lentr = mutils.toint(content[utape + 4: utape + 8])
-            utape += (lentr + 8)
-            trkip = content[utape - lentr : utape]
-            leny = len(trkip)
-            if leny == 0: break
-            trk_elist = []
-            to, fr = 0, 0 #Start state
-            tape = -1 #Start at far left
+            mid = cls(vformat_type, vtrack_count, vtime_div, empty = True)
+            utape = 14
+            for t in mid.tracks:
+                vmtrk = content[utape: utape + 4]
+                lentr = mutils.toint(content[utape + 4: utape + 8])
+                utape += (lentr + 8)
+                trkip = content[utape - lentr : utape]
+                leny = len(trkip)
+                if leny == 0: break
+                trk_elist = []
+                to, fr = 0, 0 #Start state
+                tape = -1 #Start at far left
 
-            vbuf = bytearray()
-            del_time = 0
-            kparams = {}
-            # print('trk :\n', mutils.hexstr(trkip, leng= 16, group=2, numlen= 2))
-            # hex_string = "".join("%02x" % b for b in content)
-            # print("E--> ", hex_string)
-            # print(trkip)
-            while True:
-                tape += 1
-                # print('tape ---> ', tape)
-                # if tape < leny : print('state =: ', to , ', tape ---> :', hex(tape), ',  i/p : ', hex(trkip[tape]))
-                if to == 0: #Init State, Deltatime Detection
-                    vbuf.append(trkip[tape])
-                    if trkip[tape] < 0x80:
-                        del_time = mutils.vartoint(vbuf)
-                        vbuf = bytearray()
-                        to = 1
+                vbuf = bytearray()
+                del_time = 0
+                kparams = {}
+                # print('trk :\n', mutils.hexstr(trkip, leng= 16, group=2, numlen= 2))
+                # hex_string = "".join("%02x" % b for b in content)
+                # print("E--> ", hex_string)
+                # print(trkip)
+                while True:
+                    if tape > leny: 
+                        raise ValueError("File has sys event, not supported by us : rmidi")
 
-                elif to == 1: #Event Detection
-                    # print('In event Detection L : ')
-                    if 0x80 <= trkip[tape] < 0xF0: to = 2 #Channel Event
-                    elif trkip[tape] == 0xFF: to = 7 #Meta Event 
-                    elif trkip[tape] == 0xF0 or trkip[tape] == 0xF7 : to = 4
-                    elif 'fromevent' in kparams:
-                        if kparams['fromevent'] == 'Channel':
-                            tape -= 1
-                            to = 5
-                        else : raise ValueError('kparams wrongly set , attr - fromevent is ' + kparams['fromevent']) 
-                    else : raise Exception('Error in Event detection phase : no event matched ... event id : ' + hex(trkip[tape]))
-                
-                elif to == 2: #Channel Event
-                    tape -= 1
-                    ev = mutils.numin(trkip[tape], 4, 4)
-                    ind = find_location(ev, Constant.ch_event_format)
-                    if ind:
-                        evt_info = Constant.ch_event_format[ind[0]]
-                        kparams['event_id'] = trkip[tape]
-                        kparams['len'] = evt_info[2]
-                        to = 5
-                        pass
-                    else : raise Exception("Can't parse the file\nChannel Event not in parsers list\nChannel Event ID: " + hex(trkip[tape]))
-                    fr = 2
-                    
-                elif to == 3: #Meta Event
-                        if 'mlength' in kparams:
-                            # print("le = ", hex(kparams.get('le')), ", ip len : ", hex(kparams.get('mlength')))
-                            if kparams.get('le') == 0:
-                                trk_elist.append(MIDI.Track.Event.MetaEvent(del_time, stype, params= ()))
-                                break
-                            elif kparams.get('le') == kparams.get('mlength') or kparams.get('le') == -1:
-                                tape += kparams.get('mlength')
-                                params = trkip[tape - le: tape]
-                                trk_elist.append(MIDI.Track.Event.MetaEvent(del_time, stype, params= params))
+                    tape += 1
+                    # print('tape ---> ', tape)
+                    # if tape < leny : print('state =: ', to , ', tape ---> :', hex(tape), ',  i/p : ', hex(trkip[tape]))
+                    if to == 0: #Init State, Deltatime Detection
+                        vbuf.append(trkip[tape])
+                        if trkip[tape] < 0x80:
+                            del_time = mutils.vartoint(vbuf)
+                            vbuf = bytearray()
+                            to = 1
+
+                    elif to == 1: #Event Detection
+                        # print('In event Detection L : ')
+                        if 0x80 <= trkip[tape] < 0xF0: to = 2 #Channel Event
+                        elif trkip[tape] == 0xFF: to = 7 #Meta Event 
+                        elif trkip[tape] == 0xF0 or trkip[tape] == 0xF7 : to = 4
+                        elif 'fromevent' in kparams:
+                            if kparams['fromevent'] == 'Channel':
                                 tape -= 1
-                            else: raise ValueError("Event length from file cant match with list avail.")
-                        else: raise Exception('kparams errors... mlength not in kparams')
-
-                        kparams['fromevent'] = 'Meta'
-                        to = 0
+                                to = 5
+                            else : raise ValueError('kparams wrongly set , attr - fromevent is ' + kparams['fromevent']) 
+                        else : raise Exception('Error in Event detection phase : no event matched ... event id : ' + hex(trkip[tape]))
+                    
+                    elif to == 2: #Channel Event
+                        tape -= 1
+                        ev = mutils.numin(trkip[tape], 4, 4)
+                        ind = find_location(ev, Constant.ch_event_format)
+                        if ind:
+                            evt_info = Constant.ch_event_format[ind[0]]
+                            kparams['event_id'] = trkip[tape]
+                            kparams['len'] = evt_info[2]
+                            to = 5
+                            pass
+                        else : raise Exception("Can't parse the file\nChannel Event not in parsers list\nChannel Event ID: " + hex(trkip[tape]))
+                        fr = 2
                         
-            
-                elif to == 4: #Sys Event
-                    pass
-                elif to == 5: #Sub Channel Event
-                    tape += kparams.get('len') 
-                    params = trkip[tape - kparams.get('len') : tape]
-                    tape -= 1
-                    # print('params : ',mutils.hexstr(params))
-                    trk_elist.append(MIDI.Track.Event.ChannelEvent(del_time, kparams.get('event_id'), params= params))
-                    kparams['fromevent'] = 'Channel'
-                    to = 0
+                    elif to == 3: #Meta Event
+                            if 'mlength' in kparams:
+                                # print("le = ", hex(kparams.get('le')), ", ip len : ", hex(kparams.get('mlength')))
+                                if kparams.get('le') == 0:
+                                    trk_elist.append(MIDI.Track.Event.MetaEvent(del_time, stype, params= ()))
+                                    break
+                                elif kparams.get('le') == kparams.get('mlength') or kparams.get('le') == -1:
+                                    tape += kparams.get('mlength')
+                                    params = trkip[tape - le: tape]
+                                    trk_elist.append(MIDI.Track.Event.MetaEvent(del_time, stype, params= params))
+                                    tape -= 1
+                                else: raise ValueError("Event length from file cant match with list avail.")
+                            else: raise Exception('kparams errors... mlength not in kparams')
 
-                elif to == 6: #Var length calculator
-                    vbuf.append(trkip[tape])
-                    if trkip[tape] < 0x80:
-                        kparams['mlength'] = mutils.vartoint(vbuf)
-                        vbuf = bytearray()
-                        to = 3
-                    pass
-                elif to == 7: #Meta sub event
-                    ind = find_location(trkip[tape], Constant.meta_event_format)
-                    if ind:
-                        evt_info = Constant.meta_event_format[ind[0]]
-                        stype = evt_info[0]
-                        le = evt_info[2]
-                        kparams['le'] = le
-                        kparams['stype'] = stype
+                            kparams['fromevent'] = 'Meta'
+                            to = 0
+                            
+                
+                    elif to == 4: #Sys Event
                         to = 6
-                    else : raise Exception("Can't parse the file\nMeta Event Subtype not in parsers list\nMeta Event Subtype ID: " + hex(trkip[tape]))
+                        kparams['fromevent'] = 'sys'
+                        pass
+                    elif to == 5: #Sub Channel Event
+                        tape += kparams.get('len') 
+                        params = trkip[tape - kparams.get('len') : tape]
+                        tape -= 1
+                        # print('params : ',mutils.hexstr(params))
+                        trk_elist.append(MIDI.Track.Event.ChannelEvent(del_time, kparams.get('event_id'), params= params))
+                        kparams['fromevent'] = 'Channel'
+                        to = 0
 
-            t.__reinit__(id, len(trk_elist), trk_elist, mid)
+                    elif to == 6: #Var length calculator
+                        vbuf.append(trkip[tape])
+                        if trkip[tape] < 0x80:
+                            kparams['mlength'] = mutils.vartoint(vbuf)
+                            vbuf = bytearray()
+                            if 'fromevent' in kparams:
+                                if kparams['fromevent'] == 'sys':
+                                    to = 8
+                                    continue
+                            to = 3
+                        pass
+                    elif to == 7: #Meta sub event
+                        ind = find_location(trkip[tape], Constant.meta_event_format)
+                        if ind:
+                            evt_info = Constant.meta_event_format[ind[0]]
+                            stype = evt_info[0]
+                            le = evt_info[2]
+                            kparams['le'] = le
+                            kparams['stype'] = stype
+                            to = 6
+                        else : raise Exception("Can't parse the file\nMeta Event Subtype not in parsers list\nMeta Event Subtype ID: " + hex(trkip[tape]))
+                    elif to == 8:
+                        if 'mlength' in kparams:
+                            tape += kparams.get('mlength')
+                        to == 0
+
+
+                t.__reinit__(id, len(trk_elist), trk_elist, mid)
+        except Exception:
+            raise Exception('Something not alright : rimidi')
         # print(mid)
         return mid
     def decompress(self):

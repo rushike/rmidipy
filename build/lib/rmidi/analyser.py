@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 from rmidi.MIDI import MIDI, Constant
 from rmidi.mutils import channel as mchannel
 from rmidi import mutils
-
+import glob, os
+import numpy
 class Analyser:
     def __init__(self, midi_file, **kwargs):
         self.__midi = MIDI.parse_midi(midi_file)
@@ -32,7 +33,39 @@ class Analyser:
             return c_stat_freq
         return stat_freq 
 
+    @classmethod
+    def analyse_dataset(cls, folder_path, save = '.', st = 1, end = 100):
+        files = mutils.get_all_midis(folder_path)
+        zstats = {}
+        ana = cls(files[0])
+        res = ana.stats(True)
+        try : 
+            for k, v in res.items():
+                zstats[k] = {}
+                for ik , iv in v.items():
+                    try:
+                        zstats[k][ik] = iv
+                    except Exception:
+                        zstats[k][ik] = 0
 
+            for f in files[st:end]:
+                try:
+                    ana = cls(f)
+                    res = ana.stats(True)
+                except Exception:
+                    continue
+
+                for k, v in res.items():
+                    for ik , iv in v.items():
+                        try:
+                            zstats[k][ik] += iv
+                        except Exception:
+                            zstats[k][ik] = 0
+                del ana
+        except Exception:
+            pass
+        numpy.save(save + '\\_FST_' + str(st) + '_END_' + str(end) + '_NUMPYSTORE_DATSET_' + folder_path.split('\\')[-1], zstats)
+        1 == 2
 
 if __name__ == "__main__":
     # f = "./midis/Believer_-_Imagine_Dragons.mid"

@@ -1,6 +1,7 @@
 import math, re
 import numpy
 import hashlib as ha
+import os, glob
 
 hash_ =  ha.md5()
 
@@ -159,3 +160,16 @@ def note_to_midi(note):
 
 def dictn(ndlist):
     return {l[0] : l[1:]  for l in ndlist}
+
+def get_all_midis(folder_path):
+    # os.chdir(folder_path)
+    f1, f2 = [], []
+    for root, dirs, files in os.walk(folder_path, topdown=False):
+        # for name in files:
+        #     print(os.path.join(root, name))
+        for name in dirs:
+            print(os.path.join(root, name))
+            p = os.path.join(root, name)
+            f1 += glob.glob(p + '\*.mid')
+            f2 += glob.glob(p + '\*.midi')
+    return f1 + f2
