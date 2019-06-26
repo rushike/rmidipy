@@ -2,8 +2,12 @@ import matplotlib.pyplot as plt
 from rmidi.MIDI import MIDI, Constant
 from rmidi.mutils import channel as mchannel
 from rmidi import mutils
+from rmidi.absolutemidi import AbsoluteMidi
+from rmidi.constant import converter
 import glob, os
 import numpy
+# import music21
+
 class Analyser:
     def __init__(self, midi_file, **kwargs):
         self.__midi = MIDI.parse_midi(midi_file)
@@ -67,22 +71,46 @@ class Analyser:
         numpy.save(save + '\\_FST_' + str(st) + '_END_' + str(end) + '_NUMPYSTORE_DATSET_' + folder_path.split('\\')[-1], zstats)
         1 == 2
 
+    def track_analysis(self, resolution = 32): #Instrument Based
+        #probably may out of scale , strech or contraction may present at end
+        amidi = AbsoluteMidi.to_abs_midi(self.__midi)
+        # print(amidi)
+        isec = 500 * (4 / resolution) #17.250  // In milliseconds
+        
+        # LEN = int((300 * 1000) // isec) # For 5 min (MAX) only
+        LEN = 4800
+        trackers = numpy.zeros(amidi.track_count)
+        track_anas = converter.meta_event_format()
+        res_set = {}
+        for i, t in enumerate(amidi.tracks):
+            instrument = t.get_event('instrument_name', depth = 1)
+            try :
+                ttempo = mutils.toint(t.get_event('set_tempo', depth = 1)[0].data, 8)
+                tempo = ttempo
+            except IndexError:
+                pass
+            res_arr =  numpy.zeros(LEN)
+            res_set[instrument[0].data.decode("utf-8")  + " " + str(i)] = res_arr
+            nit = 0 #numpy array iterator
+            prev_oucr, dut = 0, 0
+            # print(t.trk_event[-11 : -1])
+            for e in t.trk_event:
+                if e.is_note_on_off_event():
+                    # print(e)
+                    if prev_oucr == e.abstime: 
+                        nit -= dut
+                        # print(res_arr[nit: nit + dut])
+                    dut = int(32 // mutils.nth_note(e.elength, tempo=tempo)) 
+                    prev_oucr = e.abstime
+                    res_arr[nit: nit + dut] += 1
+                    # print(res_arr[nit: nit + dut])
+                    nit += dut
+            # print("--------------------------------------=============================----------------------------------")
+
+        return res_set
+            
+
 if __name__ == "__main__":
-    # f = "./midis/Believer_-_Imagine_Dragons.mid"
-
-    # y = MIDI.parse_midi(f)
-
-    # t0 = y.track(0)
-
-    # n = t0.notes()
-    # nn = n["note_series"]
-    # x = [v[0] for v in nn]
-
-    # y = [v[1] for v in nn]
-
-    # plt.plot(x, y)
-    # plt.legend()
-    # plt.show()
     f = 'midis\\Believer_Imagine_Dragons'
 
     c = Analyser(f)

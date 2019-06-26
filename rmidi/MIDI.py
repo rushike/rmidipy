@@ -3,6 +3,7 @@ import numpy as np
 import os, os.path as pathmap
 from rmidi import mutils
 import itertools
+from rmidi.constant import converter
 
 WRAP_DATA = 0x7f
 WRAP_BITS = 7
@@ -180,13 +181,13 @@ class MIDI:
     def track(self, track_no):#Indexing from Zero
         if self.track_count < track_no : raise IndexError("Track no out of range")
         return self.tracks[track_no]
-    def set_tempo(self, val, inbpm = True): 
+    def set_time_div(self, val, inbpm = True): 
         """val acts as actual bpm value if inbpm is True, 
          or as no ticks per seconds count if inbpm is False
-        
+         It actually sets ticks resolution
         Arguments:
-            self {[type]} -- [description]
-        
+            self {MIDI} -- [description]
+            val {int} 
         Keyword Arguments:
             inbpm {bool} -- [description] (default: {True})
         """
@@ -398,6 +399,7 @@ class MIDI:
             self.length = 0
             self.trk_event = []
             self.midi_ = midi
+            # self.track_m = self
             if empty : return
             self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x58,(0x4, 0x2, 0x18, 0x8))) #Meta Event : Time Signature
             self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x59, (0x0, 0x0))) #Meta Event : Key Signature
@@ -428,7 +430,44 @@ class MIDI:
             self.trk_event.append(evt)
             self.trk_event.append(end)
             return None
+        def set_tempo(self, time, tempo):
+            tmp = ((500000 * 120) // tempo)
+            self.add_event(0, 'set_tempo', tempo = tmp)
+        def tempo(self):
+            return mutils.toint(self.get_event('set_tempo', depth = 1)[0].data, 8)
 
+        def get_event(self, event, depth = 10000):
+            res = []
+            ind1 = find_location(event, Constant.ch_event_format)
+            dep = 0
+            if ind1:
+                id_ = Constant.ch_event_format[ind1[0]][0]
+                for e in self.trk_event:
+                    if e.event_id == id_: res.append(copy.deepcopy(e))
+                    dep += 1
+                    if dep > depth: break
+                return res            
+            ind2 = find_location(event, Constant.meta_event_format)
+            dep = 0
+            if ind2:
+                id_ = Constant.meta_event_format[ind2[0]][0]
+                event_info = converter.meta_event_format()['0xFF'][mutils.hex2(id_)]
+                # event_info = event_info['0xFF'][mutils.hex2(id_)]
+                for e in self.trk_event:
+                    if e.meta_event_type == id_: 
+                        res.append(copy.deepcopy(e))
+                        dep += 1
+                        if dep > depth: break
+                if id_ in {0x4} and len(res) == 0: 
+                    ne = MIDI.Track.Event.MetaEvent(0, id_, event_info['default'])
+                    return [ne]
+                return res
+
+            # ind = ind1 if not ind1  else ind2 if not ind2  else None
+            # print("ind : From get_event --  ", ind)
+            # if not ind:
+            #     print("id_ : From get_event -- ", id_)
+                
         def add_event(self, time, event, **kparams):#Can't add key sig event for now
             if 'delta' in kparams:
                 pass
@@ -455,13 +494,13 @@ class MIDI:
                         self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= Constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
                         return True
                     #Adding meta event    
-                    ind = find_location(event, Constant.ch_event_format)
+                    ind = find_location(event, Constant.meta_event_format)
                     if ind :
-                        evt_info = Constant.ch_event_format[ind[0]]
+                        evt_info = Constant.meta_event_format[ind[0]]
                         event_id = 0xff
                         meta_event_type = evt_info[0]
                         if event == 'set_tempo':
-                            a, b, c = split(kparams.get('set_tempo'), 3, 7)
+                            a, b, c = split(kparams.get('tempo'), 3, 8)
                             self._add_event(MIDI.Track.Event(delta_time=self.delta_time(time), etype= Constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data= bytearray((a, b, c))))
                             return
                         if evt_info[2] == -1:
@@ -480,7 +519,7 @@ class MIDI:
                                     return
                                 maxr = [evt_info[i] for i in range(4 + evt_info[2], 4 + 2 * evt_info[2])]
                             else : maxr = [evt_info[3+ evt_info[2]]] * evt_info[2]
-                            print(maxr)
+                            # print(maxr)
                             for i in range(3, 3 + evt_info[2]):
                                 params = [0] * evt_info[2]
                                 if evt_info[i] in kparams:
@@ -550,7 +589,7 @@ class MIDI:
                     if to == 0:#Delta time == 0
                         to = 1 
                     if to == 1: #check if closing the node
-                        if eventid  & 0xf == 8 or velocity == 0: to = 3
+                        if (eventid  & 0xf == 8) or velocity == 0: to = 3
                         else : to = 2
                     if to == 2: # push the current time
                         dictn[noteval] = timekeeper
@@ -587,6 +626,8 @@ class MIDI:
                 self.length = length
                 self.data = data
                 self.bytes = bytearray()
+                self.abstime = 0
+                self.elength = 0
 
             def set_date_params(self, params):
                 self.data = bytearray(params)
@@ -605,7 +646,8 @@ class MIDI:
 
             def is_sys_event(self):
                 return self.etype == Constant.SYS_EVENT
-
+            def is_note_on_off_event(self):
+                return 0x7f < self.event_id < 0xa0
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):
@@ -661,5 +703,12 @@ class MIDI:
             
             def __repr__(self):
                 # print("E--> ", hex_string)
+                # mhxmet = hex(self.meta_event_type) if self.meta_event_type else '0'
+                # return "Delta Time : " + hex(self.delta_time) + ", Etype : " + self.etype + ", Event ID : " + hex(self.event_id) + ", META : " + mhxmet + ", Length : " + hex(self.leng()) + ", Data --> " + mutils.hexstr(self.data, group= 2)
+                mstr = '______________________________________________________________________________________________________________________________ . . . \n'
+                mstr += '| Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA \n' #% (e.abstime, e.elength, hex(e.delta_time), e.etype, hex(e.event_id), mhxmet, hex(e.leng()),  mutils.hexstr(e.data, group= 2))
+                mstr += '|______________________________________________________________________________________________________________________________ . . . \n'
                 mhxmet = hex(self.meta_event_type) if self.meta_event_type else '0'
-                return "Delta Time : " + hex(self.delta_time) + ", Etype : " + self.etype + ", Event ID : " + hex(self.event_id) + ", META : " + mhxmet + ", Length : " + hex(self.leng()) + ", Data --> " + mutils.hexstr(self.data, group= 2)
+                # estr = " Abs Time : " + str(e.abstime) + "Duration : " + str(e.elength) + " |||>>>> Delta Time : " + hex(e.delta_time) + ", Etype : " + e.etype + ", Event ID : " + hex(e.event_id) + ", META : " + mhxmet + ", Length : " + hex(e.leng()) + ", Data --> " + mutils.hexstr(e.data, group= 2)
+                estr = '| %-15f | %-15f | %-11s | %-10s | %-10s | %-5s | %-10s |  %s' % (self.abstime, self.elength, hex(self.delta_time), self.etype, hex(self.event_id), mhxmet, hex(self.leng()),  mutils.hexstr(self.data, group= 2))
+                return estr

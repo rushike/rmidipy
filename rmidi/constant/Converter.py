@@ -1,5 +1,5 @@
 from rmidi.constant import Constants
-
+import os
 import json
 def dict_to_event_json(filename, dictn):
     with open(filename, 'w') as wrt:
@@ -93,14 +93,35 @@ def to_ch_controller_dict():
     print(res)
     return res
 
+def ch_event_format():
+    f = './rmidi/constant/ch_event_format.json'
+    exists = os.path.exists(f)
+    with open('./rmidi/constant/ch_event_format.json', 'r') as f:
+        return json.load(f.read())
+
+def meta_event_format():
+    f = '.\\rmidi\\constant\\meta_event_format.json'
+    exists = os.path.exists(f)
+    with open(f, 'r+') as fil:
+    # st = fil.read()
+    # fil.close()
+        res = json.load(fil)
+
+
+    return res
+
+def sys_event_format():
+    with open('./rmidi/constant/sys_event_format.json', 'r') as f:
+        return json.load(f.read())
+
 # ch_event = to_channel_event_dict()
 # dict_to_event_json('./rmidi/constant/ch_event_format.json', ch_event)
 
-meta_event = to_meta_event_dict()
-dict_to_event_json('./rmidi/constant/meta_event_format.json', meta_event)
+# meta_event = to_meta_event_dict()
+# dict_to_event_json('./rmidi/constant/meta_event_format.json', meta_event)
 
-# ch_cntrl_event = to_ch_controller_dict()
-# dict_to_event_json('./rmidi/constant/ch_controller.json', ch_cntrl_event)
+# # ch_cntrl_event = to_ch_controller_dict()
+# # dict_to_event_json('./rmidi/constant/ch_controller.json', ch_cntrl_event)
 
-sys_event = to_sys_event_dict()
-dict_to_event_json('./rmidi/constant/sys_event_format.json', sys_event)
+# sys_event = to_sys_event_dict()
+# dict_to_event_json('./rmidi/constant/sys_event_format.json', sys_event)

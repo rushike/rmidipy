@@ -8,6 +8,12 @@ hash_ =  ha.md5()
 WRAP_DATA = 0x7f
 WRAP_BITS = 7
 
+def hex2(val):
+    return "0x{:02x}".format(val)
+
+@DeprecationWarning
+def hexn(val, n):
+    return "0x{:0{}x}".format(val, n)
 
 def ch_event_id(id, no) :
     return ((id & 0xf) << 4) | (no & 0xf)
@@ -51,6 +57,7 @@ def to_fix_length(k, leng, bits):
 
 def vartoint(varray:bytearray()):
     return toint(varray, 7)
+
 def toint(a : bytearray(), bits = 8, mode = 'BG'):
     WRAPPER = (1 << bits) - 1
     num, itr, ind, s, le = 0x00, 0, 0, 1, len(a)
@@ -125,7 +132,7 @@ def hexstr(bnum: bytearray, leng = 0, group = 0, numlen = 2, ftype = 0):
         st += ('0x' + x + ' ')
         if i % group == 0: st += ' '
         if (i + 1) % leng == 0: st += '\n'
-    return st
+    return st + '\n' if st == '' else st
 
 def dtime(delta_time, time_div):
     if not delta_time: return 0
@@ -173,3 +180,24 @@ def get_all_midis(folder_path):
             f1 += glob.glob(p + '\*.mid')
             f2 += glob.glob(p + '\*.midi')
     return f1 + f2
+
+def quater_note_to_millis(tempo):
+    return tempo / 60000
+
+def nth_note(duration, tempo):
+    th2 = quater_note_to_millis(tempo) / 8
+    wh_note = th2 * 32
+    to_note = duration / th2
+    rt = int(numpy.round(to_note))
+    # rt_str = '{0:05b}'.format(rt)
+    fin = 32 / rt if rt != 0 else 0
+    return fin
+
+def reduce_dim(n, factor = 8):
+    T = len(n) // factor
+    res = numpy.zeros(T)
+    
+    for i in range(T):
+        res[i] = sum(n[i : i + factor]) / factor
+
+    return res

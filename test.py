@@ -1,5 +1,6 @@
 from rmidi import mutils
 from rmidi.MIDI import MIDI
+from rmidi.absolutemidi import AbsoluteMidi
 from rmidi import rmidix
 from rmidi import analyser
 import numpy, random
@@ -66,11 +67,17 @@ midi_to_note testing from mutuls
 Testing the set_tempo of MIDI
 """
 
-# x = MIDI.parse_midi('default.mid')
+# x = MIDI.parse_midi('.\\rmidi\\default.mid')
 
-# x.set_tempo(56)
-
-# x.compress('tempo_change')
+# x.track(0).set_tempo(0, 256)
+# notes = [56, 58, 60, 61, 63, 65, 67, 68]
+# dtime = 1
+# for i in range(len(notes)):
+#     # print("tm, nt = ", dtime[i], notes[i])
+#     x.track(0).add_event(0, 'note_on', note_number = notes[i], velocity = 90, channel_no = 0)
+#     x.track(0).add_event(dtime, 'note_on', note_number = notes[i], velocity = 0, channel_no = 0)
+        
+# x.compress('..\\dataset\\midi_gen\\tempo_change')
 
 
 """
@@ -105,7 +112,7 @@ Sieve Erothenes
 '''
 Test Analyser
 '''
-f = 'rmidi\default.mid'
+# f = 'rmidi\default.mid'
 
 # c = analyser.Analyser(f)
 
@@ -113,33 +120,104 @@ f = 'rmidi\default.mid'
 
 # g = analyser.Analyser.analyse_dataset('..\\dataset\\lakh_dataset', save='..\\dataset\\numpy', end = 1000)
 
-np = numpy
-g = np.load('F:\\rushikesh\\project\\dataset\\numpy\\_FST_1_END_1000_NUMPYSTORE_DATSET_lakh_dataset.npy')
-g = g.item()
-print(g)
-sm = 0
-for k, v in g['channel'].items():
-    sm += v
-print('\n\n-------------------------------------------------\n\npercent : ', (g['channel']['pitch_bend']/sm * 100))
-# g['channel']
-fig = plt.figure(tight_layout=True)
-gs = gridspec.GridSpec(2, 2)
+# np = numpy
+# g = np.load('F:\\rushikesh\\project\\dataset\\numpy\\_FST_1_END_1000_NUMPYSTORE_DATSET_lakh_dataset.npy')
+# g = g.item()
+# print(g)
+# sm = 0
+# for k, v in g['channel'].items():
+#     sm += v
+# print('\n\n-------------------------------------------------\n\npercent : ', (g['channel']['pitch_bend']/sm * 100))
+# # g['channel']
+# fig = plt.figure(tight_layout=True)
+# gs = gridspec.GridSpec(2, 2)
 
-ax = fig.add_subplot(gs[0, :])
-cx , cy = list(g['channel'].keys()), list(g['channel'].values())
-ax.bar(cx[2:], cy[2:])
-ax.set_ylabel('frequency of occurence')
-ax.set_xlabel('channel event')
+# ax = fig.add_subplot(gs[0, :])
+# cx , cy = list(g['channel'].keys()), list(g['channel'].values())
+# ax.bar(cx[2:], cy[2:])
+# ax.set_ylabel('frequency of occurence')
+# ax.set_xlabel('channel event')
+# # plt.show()
+# v = ['meta', 'sys']
+# for i in range(2):
+#     ax = fig.add_subplot(gs[1, i])
+#     ax.bar(g[v[i]].keys(), g[v[i]].values())
+#     ax.set_ylabel('%s event' % v[i])
+#     ax.set_xlabel('%s event' % v[i])
+#     if i == 0:
+#         for tick in ax.get_xticklabels():
+#             tick.set_rotation(55)
+# fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+
 # plt.show()
-v = ['meta', 'sys']
-for i in range(2):
-    ax = fig.add_subplot(gs[1, i])
-    ax.bar(g[v[i]].keys(), g[v[i]].values())
-    ax.set_ylabel('%s event' % v[i])
-    ax.set_xlabel('%s event' % v[i])
-    if i == 0:
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(55)
-fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
 
-plt.show()
+
+'''
+Testing get event method, Track class
+
+'''
+# f = '..\\dataset\\midi_gen\\tempo_change.mid'
+
+# g = MIDI.parse_midi(f)
+
+# ev = g.track(0).get_event('set_tempo')
+# print(ev)
+# 1 == 0
+
+
+'''
+Testing AbsMIDI
+'''
+# f = '..\\dataset\\midi_gen\\tempo_change.mid'
+# f = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+
+# g = MIDI.parse_midi(f)
+
+# abst = AbsoluteMidi.to_abs_midi(g)
+# # print(abst)
+# 1 == 0
+
+'''
+Testing Track Analysis from analyser, Can extend to multiple midi
+# '''
+# fi = '..\\dataset\\midi_gen\\tempo_change.mid'
+# fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+
+# ana = analyser.Analyser(fi)
+
+# res = ana.track_analysis(resolution= 8)
+# print(res)
+
+# # g = []
+# g = res
+# fig = plt.figure(tight_layout=True)
+# gs = gridspec.GridSpec(2, 2)
+
+# ax = fig.add_subplot(gs[0, :])
+# cx , cy = numpy.arange(len(g['Piano 0'])), g['Piano 0']
+# ax.plot(cx[2:], cy[2:])
+# ax.set_ylabel('frequency of note occurence')
+# ax.set_xlabel('Piano 0')
+# # plt.show()
+# v = ['Piano 1', 'Piano 2']
+# for i in range(2):
+#     ax = fig.add_subplot(gs[1, i])
+#     ax.plot(cx, g[v[i]])
+#     ax.set_ylabel('Frequency of note occurence')
+#     ax.set_xlabel('%s' % v[i])
+#     if i == 0:
+#         for tick in ax.get_xticklabels():
+#             tick.set_rotation(55)
+# fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+
+# plt.show()
+
+'''
+nth note
+'''
+# fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+# mid = MIDI.parse_midi(fi)    
+# m = AbsoluteMidi.to_abs_midi(mid)
+# print(m.tempo)
+# t = mutils.nth_note(19.98905, m.tempo)
+1 == 0
