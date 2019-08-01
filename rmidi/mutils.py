@@ -27,6 +27,24 @@ def numin(num, startb, off):#off length of bits that want
 def meta_event_type(typ):
     return typ & 0xff
 
+def invert(num, bits = 3, twos = False):
+    # if bits == 3: return ~num & 7
+    twos = 1 if twos else 0
+    MASK = (1 << bits) - 1
+    return ((~num & MASK) + twos)  & MASK  
+
+def magnitude(num, bits):
+    """Only use for signed integer
+    
+    Arguments:
+        num {number} -- mag(num)
+        bits {number} -- bits used to encode
+    """
+    MASK = (1 << bits - 1) - 1
+    if num > MASK: return ((~num & MASK) + 1)
+    return num & MASK
+    
+
 def to_var_length(k):
     if k > 127:
         leng = length(k) // WRAP_BITS + 1
@@ -148,7 +166,7 @@ def file_hash(f, hexst = False):
 def midi_to_note(noteval):
     if not numpy.isscalar(noteval): return [midi_to_note(v) for v in noteval]
 
-    if not 20 < noteval < 128: raise ValueError('Noteval not in range : {}'.format(noteval))
+    if not 0 <= noteval < 128: raise ValueError('Noteval not in range : {}'.format(noteval))
     
     mod = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
     
@@ -156,7 +174,8 @@ def midi_to_note(noteval):
     octave = noteval // 12 - 1
     return '{}{}'.format(note, octave)
 
-def note_to_midi(note):
+@DeprecationWarning
+def note_to_midi(note): #Not implemented
     val_notes = {'c' : 0, 'c#' : 1, 'd' : 2, 'd#': 3, 'e': 4, 'f': 5, 'f#': 6, 'g': 7, 'g#': 8, 'a': 9, 'a#': 10, 'b': 11}
     if not numpy.isscalar(note): return [note_to_midi(v) for v in note]
     
@@ -192,6 +211,31 @@ def nth_note(duration, tempo):
     # rt_str = '{0:05b}'.format(rt)
     fin = 32 / rt if rt != 0 else 0
     return fin
+
+
+
+def find_in_nested_dict(dictn, value, depth = 0):
+    """ return dict containg the value in nested dict
+    
+    Arguments:
+        dictn {dict} -- nested dictionart
+        value {int} -- value to search
+    
+    Keyword Arguments:
+        depth {int} -- depth value in nested dictionary (default: {0})
+    
+    Raises:
+        ValueError: if value is not present in dict
+    
+    Returns:
+        [dict] -- dict containing the value
+    """
+    for k, v in dictn:
+        if v == value:
+            return dictn
+        elif hasattr(v, 'items'): # indicates if dictionary
+            return find_in_nested_dict(v, value, depth - 1)
+        else : raise ValueError("Value not found in the nested dictionary")
 
 def reduce_dim(n, factor = 8):
     T = len(n) // factor

@@ -3,7 +3,9 @@ import numpy as np
 import os, os.path as pathmap
 from rmidi import mutils
 import itertools
-from rmidi.constant import converter
+from rmidi.constant import converter, meta_event_format, ch_event_format, sys_event_format, Constants
+
+numpy = np
 
 WRAP_DATA = 0x7f
 WRAP_BITS = 7
@@ -374,6 +376,29 @@ class MIDI:
             f.write(bytelist)
         return bytelist
 
+
+    """
+    Fucntion for all tracks, 
+    """
+
+    def transpose_to(self, scale, s_type = 0, new = False):
+        self_copy = copy.deepcopy(self)
+        for t in self_copy.tracks:
+            t.transpose_to(scale, s_type)
+        return self_copy
+
+    def change_scale(self, scale, s_type = 0, new = False):
+        self_copy = copy.deepcopy(self)
+        for t in self_copy.tracks:
+            t.change_scale(scale)
+        return self_copy
+
+    def note_frequencies(self):
+        freq_count = numpy.zeros((self.track_count, 256))
+        for t in range(self.track_count):
+            freq_count[t] = self.tracks[t].note_frequencies()
+        return freq_count
+
     def __midiheaderbytes(self):
         byte_list = bytearray()
         byte_list.extend(Constant.Mthd)
@@ -430,20 +455,101 @@ class MIDI:
             self.trk_event.append(evt)
             self.trk_event.append(end)
             return None
+
+           
+
         def set_tempo(self, time, tempo):
             tmp = ((500000 * 120) // tempo)
             self.add_event(0, 'set_tempo', tempo = tmp)
+
         def tempo(self):
             return mutils.toint(self.get_event('set_tempo', depth = 1)[0].data, 8)
 
-        def get_event(self, event, depth = 10000):
+        def transpose_to(self, scale, s_type = 0, offset = -256, new = False):
+            self_copy = copy.deepcopy(self) if new else self
+            if offset != -256: pass
+
+            elif type(scale) == int and -7 < scale < 7 : 
+                scale_id, s_type = self.get_scale(string= False)
+                scale = Constants.SCALE[scale_id + s_type & 12]
+            elif scale in Constants.SCALE:
+                 scale_id, s_type = self.get_scale()
+                 offset = (Constants.SCALE_OFFSET[scale_id] - Constants.SCALE_OFFSET[scale])  
+            else : raise AttributeError("Scale not defined. ")
+            
+            for e in self_copy.trk_event:
+                if e.is_note_on_off_event():
+                    e.data[0] -= offset
+            return self_copy
+
+        def transpose(self, tval):
+            arr = self.notes()
+            return [(arr[0], arr[1] + tval, arr[2]) for v in arr]
+
+        def change_scale(self, scale, octave = 1, new = False):
+            """Change the scale of midi track,  
+            Assumes the c-major has no flats instead no sharps;  key sig event will    | 0xFF      |  0x59      |         0x00            |            0x01            |
+                                                                                        meta marker  key-sig       no of sharps or flats      flat or sharp indicator  
+            
+            Arguments:
+                scale {string} -- scale name in sharp notation format, like c-major, a#-minor
+
+            
+            Keyword Arguments:
+                new {bool} -- if change scale on new duplicated track (default: {False})
+                ocatave{int} -- relative integer indicating to tranfer or scale change in back or ahead octave {default: {1}}
+            """
+            self_copy = copy.deepcopy(self) if new else self
+            if scale in Constants.SCALE_OFFSET:
+                scale_id, s_type = self.get_scale()
+
+                key_sig_event = self.get_event('key_sig', new = False, depth = 1)[0]
+                key_sig = [(Constants.SCALE_KEY_SIG[scale][0] & 7) ,  mutils.invert(Constants.SCALE_KEY_SIG[scale][1] & 7, 8, True)]
+                key_sig = [key_sig[1], 1] if key_sig[0] == 0 else [key_sig[0], 0] # convert  the key sig tuple to (data, type) tuple as in midi format
+                key_sig_event.set_date_params(key_sig)
+
+                transpose_int = (Constants.SCALE_OFFSET[scale_id] - Constants.SCALE_OFFSET[scale]) - (octave - 1) * 12
+                self.transpose_to(0, offset= transpose_int)
+                return key_sig_event
+            return None
+
+        def get_scale(self, string = True, sharps = False):
+            """Finds the scale, or pattern in which track is. Can only find major, minor scale for now 
+            
+            Keyword Arguments:
+                string {bool} -- True if wants string - representation of scale(SCALE NAME) (default: {True})
+                ifmajor {int} -- [description] (default: {0})
+            
+            Raises:
+                NotImplementedError: [description]
+            
+            Returns:
+                [type] -- [description]
+            """
+            # event_info = mutils.find_in_nested_dict(Constants.meta_event_format_dict, 'key_sig')
+            event_info = Constants.meta_event_format_dict[0xFF][0x59] # 0x59 <---> key_sig
+            sharps = 1 if sharps else 0
+            for e in self.trk_event:
+                # e =  Event()
+                # if e.is_meta_event() : print(e)
+                if e.meta_event_type == 0x59: #  0x59 <---> key_sig, key signature event
+                    key, scale = mutils.magnitude(e.data[0], 8), e.data[1]
+                    if string: return Constants.SCALE_KEY_SIG_REV[key | ((sharps & 1) | 8)][sharps], scale    
+                    return key | ((scale & 1) | 8), scale
+                    # raise NotImplementedError("Implement the get_scale to use it.") 
+            if string: return 'c-major', 0
+            return 0, 0
+        def get_event(self, event, depth = 10000, new = True):
             res = []
             ind1 = find_location(event, Constant.ch_event_format)
             dep = 0
             if ind1:
                 id_ = Constant.ch_event_format[ind1[0]][0]
                 for e in self.trk_event:
-                    if e.event_id == id_: res.append(copy.deepcopy(e))
+                    if e.event_id == id_: 
+                        # res.append(copy.deepcopy(e))
+                        if new : res.append(copy.deepcopy(e))
+                        else : res.append(e)
                     dep += 1
                     if dep > depth: break
                 return res            
@@ -451,11 +557,12 @@ class MIDI:
             dep = 0
             if ind2:
                 id_ = Constant.meta_event_format[ind2[0]][0]
-                event_info = converter.meta_event_format()['0xFF'][mutils.hex2(id_)]
+                event_info = meta_event_format.X[0xFF][id_]
                 # event_info = event_info['0xFF'][mutils.hex2(id_)]
                 for e in self.trk_event:
                     if e.meta_event_type == id_: 
-                        res.append(copy.deepcopy(e))
+                        if new : res.append(copy.deepcopy(e))
+                        else : res.append(e)
                         dep += 1
                         if dep > depth: break
                 if id_ in {0x4} and len(res) == 0: 
@@ -538,21 +645,45 @@ class MIDI:
 
             return None
         def push_note(self, note_length, note_val, channel_no = 0, intensity = 0x50):
+            """Pushes the note on self track, over midi object
+            
+            Arguments:
+                note_length {int} -- tradition note length, whole(1), half(2), quater(4) and so on
+                note_val {int} -- Corrseponding note value, related to midi encoding
+            
+            Keyword Arguments:
+                channel_no {int} -- midi channel , necessity for channel (default: {0})
+                intensity {hexadecimal} -- loudness, volume, or how hard the note is hit (default: {0x50})
+            """
             end = self.trk_event.pop()
             self.trk_event.append(MIDI.Track.Event.ChannelEvent(self.delta_time(note_length), 0x9, channel_no, (note_val, intensity)))
             self.trk_event.append(end)
-        
-        def transpose(self, tval):
-            arr = self.notes()
-            return [(arr[0], arr[1] + tval, arr[2]) for v in arr]
 
 
-        def close_note(self, note_length, note_val, channel_no):
+        def close_note(self, note_length, note_val, channel_no, intensity = 0):
+            """Pushes the note on self track, over midi object
+            
+            Arguments:
+                note_length {int} -- tradition note length, whole(1), half(2), quater(4) and so on
+                note_val {int} -- Corrseponding note value, related to midi encoding
+            
+            Keyword Arguments:
+                channel_no {int} -- midi channel , necessity for channel (default: {0})
+                intensity {hexadecimal} -- loudness, volume, or how hard the note is hit (default: {0x50})
+            """
             end = self.trk_event.pop()
             self.trk_event.append(MIDI.Track.Event.ChannelEvent(self.delta_time(note_length), 0x8, channel_no, (note_val, 0x30)))
             self.trk_event.append(end)
         
         def delta_time(self, note_length):#Computes the delta time from tradition note duration, full, half, quater 
+            """ Computes the delta time from tradition note duration, full, half, quater 
+            Assumes every midi file of 4 / 4 key sig for now 
+            
+            Arguments:
+                note_length {int} -- tradition note duration, full(1), half(2), quater(4)
+            Returns:
+                [int] -- delta_time
+            """
             if not note_length: return 0
             return (self.midi_.time_div * 4) // note_length
         
@@ -572,6 +703,20 @@ class MIDI:
             for i in range(4, 8):
                 byte_list.insert(i, le[i - 4])
             return byte_list
+
+        def note_frequencies(self):
+            freq_count = numpy.zeros(256) #index represent midi note
+            for e in self.trk_event:
+                # e = Event()
+                if e.is_note_off_event():
+                    freq_count[e.data[0]] += 1 #incerementin note count of data[0]
+            return freq_count
+
+        def min_note(self):
+            fre = numpy.trim_zeros(self.note_frequencies())
+            return fre[0]
+
+            
 
         def notes(self, abs = True, eventtype = None):
             dictn = {}
@@ -648,6 +793,9 @@ class MIDI:
                 return self.etype == Constant.SYS_EVENT
             def is_note_on_off_event(self):
                 return 0x7f < self.event_id < 0xa0
+
+            def is_note_off_event(self):
+                return 0x8f < self.event_id < 0xa0 or (False if len(self.data) < 2 else self.data[1] == 0) #checked in note channel id == 0xv9 or velocity == 0
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):

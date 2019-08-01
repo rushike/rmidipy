@@ -6,6 +6,7 @@ from rmidi import analyser
 import numpy, random
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+from rmidi.dataset import piano_roll
 '''
 MIDI Object Testinh
 '''
@@ -185,7 +186,7 @@ Testing Track Analysis from analyser, Can extend to multiple midi
 
 # ana = analyser.Analyser(fi)
 
-# res = ana.track_analysis(resolution= 8)
+# res = ana.track_analysis(resolution= 32)
 # print(res)
 
 # # g = []
@@ -220,4 +221,63 @@ nth note
 # m = AbsoluteMidi.to_abs_midi(mid)
 # print(m.tempo)
 # t = mutils.nth_note(19.98905, m.tempo)
+
+'''
+piano roll testing
+'''
+# fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+# mid = MIDI.parse_midi(fi) 
+# numpy.set_printoptions(threshold=200)
+
+# roll = piano_roll.PianoRoll(mid)
+
+# roll_mat = roll.pianoroll()
+# st = roll.to_str()
+# print(st)
+# print(len(st))
+# 1 == 0
+
+"""
+transpose_to testing 
+"""
+# fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+# mid = MIDI.parse_midi(fi) 
+# numpy.set_printoptions(threshold=200)
+
+# trans = mid.transpose_to('c-major')
+# trans = mid.change_scale('a-major')
+# print(trans.track(0).get_event('key_sig'))
+# trans.create_file('transpose_one')
+
+"""
+note frequencies
+"""
+fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+mid = MIDI.parse_midi(fi) 
+numpy.set_printoptions(threshold=200)
+
+freq_count = mid.note_frequencies()
+
+print(freq_count)
+
+fig = plt.figure(tight_layout=True)
+gs = gridspec.GridSpec(1, freq_count.shape[0])
+
+
+# plt.show()
+v = ['meta', 'sys']
+for i in range(2):
+    ax = fig.add_subplot(gs[0,i])
+    cx , cy = numpy.arange(256), freq_count[i]
+    ax.bar(cx, cy)
+    ax.set_ylabel('frequency of occurence')
+    ax.set_xlabel('midi notes')
+    if i == 0:
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(55)
+fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
+
+plt.show()
+
+
 1 == 0
