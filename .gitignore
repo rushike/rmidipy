@@ -1,0 +1,6 @@
+.vscode
+*.ipynb_*
+*__pycache__*
+env/*
+dist/*
+build/*

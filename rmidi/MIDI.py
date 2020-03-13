@@ -337,7 +337,7 @@ class MIDI:
                             kparams['le'] = le
                             kparams['stype'] = stype
                             to = 6
-                        else : raise Exception("Can't parse the file\nMeta Event Subtype not in parsers list\nMeta Event Subtype ID: " + hex(trkip[tape]))
+                        else : raise Exception(str(e) + "\nCan't parse the file\nMeta Event Subtype not in parsers list\nMeta Event Subtype ID: " + hex(trkip[tape]))
                     elif to == 8:
                         if 'mlength' in kparams:
                             tape += kparams.get('mlength')
@@ -345,8 +345,8 @@ class MIDI:
 
 
                 t.__reinit__(id, len(trk_elist), trk_elist, mid)
-        except Exception:
-            raise Exception('Something not alright : rimidi')
+        except Exception as e:
+            raise Exception('Something not alright : rimidi' + str(e))
         # print(mid)
         return mid
     def decompress(self):
@@ -795,7 +795,7 @@ class MIDI:
                 return 0x7f < self.event_id < 0xa0
 
             def is_note_off_event(self):
-                return 0x8f < self.event_id < 0xa0 or (False if len(self.data) < 2 else self.data[1] == 0) #checked in note channel id == 0xv9 or velocity == 0
+                return 0x8f < self.event_id < 0x90 or (False if len(self.data) < 2 else self.data[1] == 0) #checked in note channel id == 0x8 or velocity == 0
                 
             @classmethod
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):

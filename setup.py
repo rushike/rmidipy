@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rmidi",
-    version="0.0.27",
+    version="0.0.29",
     # scripts = ['MIDI.py', 'mutils.py', 'rmidi.py', 'sound.py'],
     packages=['rmidi', 'rmidi.constant', 'rmidi.dataset'],
     author="rushike",

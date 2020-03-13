@@ -14,7 +14,7 @@ class AbsoluteMidi(MIDI):
         tempo = 500000
         time_div = absmidi.time_div
         event_trk = [MIDI.Track(absmidi, empty= True) for _ in range(absmidi.track_count)]
-        print(event_trk[0] is event_trk[1])
+        # print(event_trk[0] is event_trk[1])
         for i, t in enumerate(absmidi.tracks):
             trk = event_trk[i]
             evts = []
