@@ -8,13 +8,12 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from rmidi.dataset import piano_roll
 '''
-MIDI Object Testinh
+MIDI Object Testing
 '''
-
 # import os
 
-# y = MIDI.parse_midi('./midis/Believer_-_Imagine_Dragons.mid')
-
+# y = MIDI.parse_midi('check.mid')
+# print(y)
 # tr = y.track(0)
 
 # no = tr.notes()
@@ -173,9 +172,11 @@ Testing AbsMIDI
 # f = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
 
 # g = MIDI.parse_midi(f)
+y = MIDI.parse_midi('check.mid')
 
-# abst = AbsoluteMidi.to_abs_midi(g)
-# # print(abst)
+abst = AbsoluteMidi.to_abs_midi(y)
+sbty = abs(y)
+print(abst)
 # 1 == 0
 
 '''
@@ -252,32 +253,34 @@ transpose_to testing
 """
 note frequencies
 """
-fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
-mid = MIDI.parse_midi(fi) 
-numpy.set_printoptions(threshold=200)
+# fi = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
+# mid = MIDI.parse_midi(fi) 
+# numpy.set_printoptions(threshold=200)
 
-freq_count = mid.note_frequencies()
+# freq_count = mid.note_frequencies()
 
-print(freq_count)
+# print(freq_count)
 
-fig = plt.figure(tight_layout=True)
-gs = gridspec.GridSpec(1, freq_count.shape[0])
+# fig = plt.figure(tight_layout=True)
+# gs = gridspec.GridSpec(1, freq_count.shape[0])
 
+
+# # plt.show()
+# v = ['meta', 'sys']
+# for i in range(2):
+#     ax = fig.add_subplot(gs[0,i])
+#     cx , cy = numpy.arange(256), freq_count[i]
+#     ax.bar(cx, cy)
+#     ax.set_ylabel('frequency of occurence')
+#     ax.set_xlabel('midi notes')
+#     if i == 0:
+#         for tick in ax.get_xticklabels():
+#             tick.set_rotation(55)
+# fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
 
 # plt.show()
-v = ['meta', 'sys']
-for i in range(2):
-    ax = fig.add_subplot(gs[0,i])
-    cx , cy = numpy.arange(256), freq_count[i]
-    ax.bar(cx, cy)
-    ax.set_ylabel('frequency of occurence')
-    ax.set_xlabel('midi notes')
-    if i == 0:
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(55)
-fig.align_labels()  # same as fig.align_xlabels(); fig.align_ylabels()
 
-plt.show()
+
 
 
 1 == 0

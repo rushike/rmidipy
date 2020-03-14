@@ -1,6 +1,162 @@
 # rmidipy
-Math Sequence to midi, 
+This python library is intended to open midi files as python objects. Midi file is binary files, _list_ in form of tracks.
+Every _track_ contains sequence of __events__. Each __event__ is assosiated __*delta time*__, which refers to time from perivous 
+event, current event should occur.
 
-The package will help in opening the midi files and geting modified it. 
+In same structure __*rmidi*__  has `MIDI` as base class, `MIDI.Track` for track representation and `MIDI.Track.Event` to represent each event.
+## MIDI 
+```python
+>>> from rmidi import MIDI
+>>> y = MIDI.parse_midi(<midi_file_name>)
+```
 
-For now it is developing stage, The functionality implemented is only of opening and closing of midi file. With same can convert sequence to midi file
+**OUTPUT**
+``` HTML_____________________________________________________________________________________________________________________________ . . .
+| Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
+|______________________________________________________________________________________________________________________________ . . .
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08
+
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x00
+
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x20
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x00
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x00
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x64
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x40
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x00
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x00
+
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x00
+
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x00
+
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50
+
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x00
+
+| 0.000000        | 0.000000        | 0x1         | META       | 0xff       | 0x2f  | 0x0        |
+```
+**OR**
+
+| Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA|
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08|
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x00|
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x20|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x00|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x00|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x64|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x40|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x00|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x00|
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x00|
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x00|
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50|
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x00|
+| 0.000000        | 0.000000        | 0x1         | META       | 0xff       | 0x2f  | 0x0        |            |
+
+### Absolute midi
+Absolute Midi is defined as its time from start, in seconds.
+
+```python
+>>> from rmidi import MIDI, AbosluteMidi
+>>> y = MIDI.parse_midi('Kuch_Toh_Hai_1.mid')
+>>> yabs = AbsoluteMidi.to_abs_midi(y)
+```
+
+**OUTPUT**
+```
+| Absolute Time   |  Duration       |  Note  Time         |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
+|______________________________________________________________________________________________________________________________ . . .
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x00
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x20
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x00
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x00
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x64
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x40
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x00
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x00
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x00
+| 0.000000        | 31.649306       | 1.0666666666666667   | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x50
+| 33.333333       | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x50
+| 66.666667       | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x50
+| 100.000000      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x50
+| 133.333333      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x50
+| 166.666667      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x50
+| 200.000000      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x50
+| 233.333333      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50
+| 0.000000        | 0.000000        | 0                    | 0x1         | META       | 0xff       | 0x2f  | 0x0        |
+*******************************************************************************************************************
+```
+
+**OR**
+
+| Absolute Time   |  Duration       |  Note  Time         |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08|
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x00|
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x20|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x00|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x00|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x64|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x40|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x00|
+| 0.000000        | 0.000000        | 0                    | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x00|
+| 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x00|
+| 0.000000        | 31.649306       | 1.0666666666666667   | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x50|
+| 33.333333       | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x50|
+| 66.666667       | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x50|
+| 100.000000      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x50|
+| 133.333333      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x50|
+| 166.666667      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x50|
+| 200.000000      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x50|
+| 233.333333      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50|
+| 0.000000        | 0.000000        | 0                    | 0x1         | META       | 0xff       | 0x2f  | 0x0        |             |
+
+

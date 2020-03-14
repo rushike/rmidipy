@@ -4,3 +4,6 @@
 env/*
 dist/*
 build/*
+rmidi.egg-info/*
+*.tans
+*.mid

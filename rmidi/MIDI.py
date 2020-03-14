@@ -171,7 +171,6 @@ class Constant:
 
 class MIDI:
     def __init__(self,  format_type = 0, track_count = 0, time_div = 0x1e0, empty = False, filename = None, ):
-        # return super().__init__(*args, **kwargs)
         self.pipe = {}
         self.filename = filename
         self.format_type = format_type
@@ -214,7 +213,6 @@ class MIDI:
     def parse_midi(cls, filename):
         with open(filename, 'rb') as f:
             content = f.read()
-            # print(cont)
             return MIDI.parser(content)
         return None
 
@@ -229,11 +227,13 @@ class MIDI:
 
             mid = cls(vformat_type, vtrack_count, vtime_div, empty = True)
             utape = 14
-            for t in mid.tracks:
+            for i, t in enumerate(mid.tracks):
                 vmtrk = content[utape: utape + 4]
                 lentr = mutils.toint(content[utape + 4: utape + 8])
+                # print(f"trk : {i}, utape : {utape}, lentr : {lentr}, content leng : {mutils.hexstr(content[utape : utape + 8])}")
                 utape += (lentr + 8)
                 trkip = content[utape - lentr : utape]
+
                 leny = len(trkip)
                 if leny == 0: break
                 trk_elist = []
@@ -249,6 +249,7 @@ class MIDI:
                 # print(trkip)
                 while True:
                     if tape > leny: 
+                        # print(f"tape : {tape},  leny : {leny} , rklist : {mutils.hexstr(trkip[:], leng = 16)}")
                         raise ValueError("File has sys event, not supported by us : rmidi")
 
                     tape += 1
@@ -306,7 +307,9 @@ class MIDI:
                 
                     elif to == 4: #Sys Event
                         to = 6
+                        kparams['sys_event_id'] = trkip[tape] 
                         kparams['fromevent'] = 'sys'
+                        # print(f"Sys event on tape : {tape}")
                         pass
                     elif to == 5: #Sub Channel Event
                         tape += kparams.get('len') 
@@ -324,6 +327,7 @@ class MIDI:
                             vbuf = bytearray()
                             if 'fromevent' in kparams:
                                 if kparams['fromevent'] == 'sys':
+                                    # print(f"sys event on tape : {tape} with mlength : {kparams['mlength']}")
                                     to = 8
                                     continue
                             to = 3
@@ -341,6 +345,9 @@ class MIDI:
                     elif to == 8:
                         if 'mlength' in kparams:
                             tape += kparams.get('mlength')
+                            params = trkip[tape - kparams.get('mlength') : tape]
+                            trk_elist.append(MIDI.Track.Event.SysEvent(del_time, kparams.get('sys_event_id'), params))
+                            # print(f"Appended Sys Event Successfully.")
                         to == 0
 
 
@@ -378,7 +385,7 @@ class MIDI:
 
 
     """
-    Fucntion for all tracks, 
+    Function for all tracks, 
     """
 
     def transpose_to(self, scale, s_type = 0, new = False):
@@ -411,9 +418,17 @@ class MIDI:
     def __refresh__(self):
         for t in self.tracks:
             pass
+    
+    def __abs__(self):
+        from rmidi import AbsoluteMidi
+        return AbsoluteMidi.to_abs_midi(self)
 
     def __repr__(self):
         st = ""
+        mstr = '______________________________________________________________________________________________________________________________ . . . \n'
+        mstr += '| Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA \n' #% (e.abstime, e.elength, hex(e.delta_time), e.etype, hex(e.event_id), mhxmet, hex(e.leng()),  mutils.hexstr(e.data, group= 2))
+        mstr += '|______________________________________________________________________________________________________________________________ . . . \n'
+        st += mstr        
         for t in self.tracks:
             st = st + t.__repr__() + "\n" 
         return st
