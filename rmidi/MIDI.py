@@ -3,7 +3,9 @@ import numpy as np
 import os, os.path as pathmap
 from rmidi import mutils
 import itertools
-from rmidi.constant import converter, meta_event_format, ch_event_format, sys_event_format, Constants
+from rmidi.constant import converter
+import rmidi as constant
+from rmidi.constant import X
 
 numpy = np
 
@@ -85,7 +87,7 @@ def find_location(text, listt):
     except StopIteration:
         return None
 
-class Constant:
+class constant:
     Mthd = (0x4d, 0x54, 0x68, 0x64)
     Mtrk = (0x4d, 0x54, 0x72, 0x6b)
     META_EVENT_END = (0x01, 0xff, 0x2f, 0x0)
@@ -213,11 +215,11 @@ class MIDI:
     def parse_midi(cls, filename):
         with open(filename, 'rb') as f:
             content = f.read()
-            return MIDI.parser(content)
+            return MIDI.parse(content)
         return None
 
     @classmethod
-    def parser(cls, content):
+    def parse(cls, content):
         try : 
             vmthd = content[:4]
             vlength = mutils.toint(content[4:8])
@@ -277,9 +279,9 @@ class MIDI:
                     elif to == 2: #Channel Event
                         tape -= 1
                         ev = mutils.numin(trkip[tape], 4, 4)
-                        ind = find_location(ev, Constant.ch_event_format)
+                        ind = find_location(ev, constant.ch_event_format)
                         if ind:
-                            evt_info = Constant.ch_event_format[ind[0]]
+                            evt_info = constant.ch_event_format[ind[0]]
                             kparams['event_id'] = trkip[tape]
                             kparams['len'] = evt_info[2]
                             to = 5
@@ -333,9 +335,9 @@ class MIDI:
                             to = 3
                         pass
                     elif to == 7: #Meta sub event
-                        ind = find_location(trkip[tape], Constant.meta_event_format)
+                        ind = find_location(trkip[tape], constant.meta_event_format)
                         if ind:
-                            evt_info = Constant.meta_event_format[ind[0]]
+                            evt_info = constant.meta_event_format[ind[0]]
                             stype = evt_info[0]
                             le = evt_info[2]
                             kparams['le'] = le
@@ -353,7 +355,7 @@ class MIDI:
 
                 t.__reinit__(id, len(trk_elist), trk_elist, mid)
         except Exception as e:
-            raise Exception('Something not alright : rimidi' + str(e))
+            raise Exception('Something not alright : rimidi --> ' + str(e))
         # print(mid)
         return mid
     def decompress(self):
@@ -365,12 +367,12 @@ class MIDI:
         # print("H : ", mutils.hexstr(bytelist))
         ch_active = False
         for t in self.tracks:
-            bytelist.extend(Constant.Mtrk)
+            bytelist.extend(constant.Mtrk)
             start = len(bytelist)
             eventbuff = bytearray()
             for e in t.trk_event:
                 eventbuff = e.to_byte_array()
-                if e.etype == Constant.CHANNEL_EVENT:
+                if e.etype == constant.CHANNEL_EVENT:
                     if ch_active == e.event_id: eventbuff.remove(e.event_id)
                     ch_active = e.event_id
                     pass
@@ -408,7 +410,7 @@ class MIDI:
 
     def __midiheaderbytes(self):
         byte_list = bytearray()
-        byte_list.extend(Constant.Mthd)
+        byte_list.extend(constant.Mthd)
         byte_list.extend(mutils.to_fix_length(6, 4, 8))
         byte_list.extend(mutils.to_fix_length(self.format_type, 2, 8))
         byte_list.extend(mutils.to_fix_length(self.track_count, 2, 8))
@@ -422,6 +424,31 @@ class MIDI:
     def __abs__(self):
         from rmidi import AbsoluteMidi
         return AbsoluteMidi.to_abs_midi(self)
+    
+    def __len__(self):
+        return self.track_count
+
+    def __getitem__(self, index):
+        """Makes objbect iterable, like array<br>
+        AbsoluteMidi can behave as 3D array, at 3rd level it will return event.attribute
+        
+        index:
+            type : int | tuple
+            int --> it represent track, method will return track
+            tuple --> max length : 3 (track, event, attribute)
+
+        Arguments:
+            index {int | tuple} -- int or tuple, int represent track, see index definition above
+        """
+        if isinstance(index, int):
+            return self.track(index)
+        if isinstance(index, tuple):
+            if len(index) == 1:
+                return self.track(index)
+            elif len(index) == 2:
+                return self.track(index[0]).note(index[1])
+            raise IndexError(f"Tuple length > 2, len : {len(index)}, index : {index}")
+        raise IndexError(f"Index might not be tuple or int")
 
     def __repr__(self):
         st = ""
@@ -430,7 +457,8 @@ class MIDI:
         mstr += '|______________________________________________________________________________________________________________________________ . . . \n'
         st += mstr        
         for t in self.tracks:
-            st = st + t.__repr__() + "\n" 
+            st = st + t.__repr__() # + "\n" 
+            st += '******************************************************************************************************************************'
         return st
 
     class Track:
@@ -486,10 +514,10 @@ class MIDI:
 
             elif type(scale) == int and -7 < scale < 7 : 
                 scale_id, s_type = self.get_scale(string= False)
-                scale = Constants.SCALE[scale_id + s_type & 12]
-            elif scale in Constants.SCALE:
+                scale = constant.SCALE[scale_id + s_type & 12]
+            elif scale in constant.SCALE:
                  scale_id, s_type = self.get_scale()
-                 offset = (Constants.SCALE_OFFSET[scale_id] - Constants.SCALE_OFFSET[scale])  
+                 offset = (constant.SCALE_OFFSET[scale_id] - constant.SCALE_OFFSET[scale])  
             else : raise AttributeError("Scale not defined. ")
             
             for e in self_copy.trk_event:
@@ -515,15 +543,15 @@ class MIDI:
                 ocatave{int} -- relative integer indicating to tranfer or scale change in back or ahead octave {default: {1}}
             """
             self_copy = copy.deepcopy(self) if new else self
-            if scale in Constants.SCALE_OFFSET:
+            if scale in constant.SCALE_OFFSET:
                 scale_id, s_type = self.get_scale()
 
                 key_sig_event = self.get_event('key_sig', new = False, depth = 1)[0]
-                key_sig = [(Constants.SCALE_KEY_SIG[scale][0] & 7) ,  mutils.invert(Constants.SCALE_KEY_SIG[scale][1] & 7, 8, True)]
+                key_sig = [(constant.SCALE_KEY_SIG[scale][0] & 7) ,  mutils.invert(constant.SCALE_KEY_SIG[scale][1] & 7, 8, True)]
                 key_sig = [key_sig[1], 1] if key_sig[0] == 0 else [key_sig[0], 0] # convert  the key sig tuple to (data, type) tuple as in midi format
                 key_sig_event.set_date_params(key_sig)
 
-                transpose_int = (Constants.SCALE_OFFSET[scale_id] - Constants.SCALE_OFFSET[scale]) - (octave - 1) * 12
+                transpose_int = (constant.SCALE_OFFSET[scale_id] - constant.SCALE_OFFSET[scale]) - (octave - 1) * 12
                 self.transpose_to(0, offset= transpose_int)
                 return key_sig_event
             return None
@@ -541,25 +569,25 @@ class MIDI:
             Returns:
                 [type] -- [description]
             """
-            # event_info = mutils.find_in_nested_dict(Constants.meta_event_format_dict, 'key_sig')
-            event_info = Constants.meta_event_format_dict[0xFF][0x59] # 0x59 <---> key_sig
+            # event_info = mutils.find_in_nested_dict(constant.meta_event_format_dict, 'key_sig')
+            event_info = constant.meta_event_format_dict[0xFF][0x59] # 0x59 <---> key_sig
             sharps = 1 if sharps else 0
             for e in self.trk_event:
                 # e =  Event()
                 # if e.is_meta_event() : print(e)
                 if e.meta_event_type == 0x59: #  0x59 <---> key_sig, key signature event
                     key, scale = mutils.magnitude(e.data[0], 8), e.data[1]
-                    if string: return Constants.SCALE_KEY_SIG_REV[key | ((sharps & 1) | 8)][sharps], scale    
+                    if string: return constant.SCALE_KEY_SIG_REV[key | ((sharps & 1) | 8)][sharps], scale    
                     return key | ((scale & 1) | 8), scale
                     # raise NotImplementedError("Implement the get_scale to use it.") 
             if string: return 'c-major', 0
             return 0, 0
         def get_event(self, event, depth = 10000, new = True):
             res = []
-            ind1 = find_location(event, Constant.ch_event_format)
+            ind1 = find_location(event, constant.ch_event_format)
             dep = 0
             if ind1:
-                id_ = Constant.ch_event_format[ind1[0]][0]
+                id_ = constant.ch_event_format[ind1[0]][0]
                 for e in self.trk_event:
                     if e.event_id == id_: 
                         # res.append(copy.deepcopy(e))
@@ -568,11 +596,11 @@ class MIDI:
                     dep += 1
                     if dep > depth: break
                 return res            
-            ind2 = find_location(event, Constant.meta_event_format)
+            ind2 = find_location(event, constant.meta_event_format)
             dep = 0
             if ind2:
-                id_ = Constant.meta_event_format[ind2[0]][0]
-                event_info = meta_event_format.X[0xFF][id_]
+                id_ = constant.meta_event_format[ind2[0]][0]
+                event_info = constant.meta_event_format[0xFF][id_]
                 # event_info = event_info['0xFF'][mutils.hex2(id_)]
                 for e in self.trk_event:
                     if e.meta_event_type == id_: 
@@ -596,10 +624,10 @@ class MIDI:
             else:
                 if type(event) == str:
                     #Adding channel event
-                    ind = find_location(event, Constant.ch_event_format)
-                    # if event in itertools.chain(*Constant.ch_event_format):
+                    ind = find_location(event, constant.ch_event_format)
+                    # if event in itertools.chain(*constant.ch_event_format):
                     if ind:
-                        evt_info = Constant.ch_event_format[ind[0]]
+                        evt_info = constant.ch_event_format[ind[0]]
                         ch_no = kparams.get('channel_no') if 'channel_no' in kparams else 0
                         event_id = (evt_info[0] << 4) | (ch_no & 7)
                         if 'params' in kparams:
@@ -613,17 +641,17 @@ class MIDI:
                                     params[i - 3] = kparams.get(evt_info[i])
                                     pass
                                 else: raise ValueError("Attribute " + evt_info[i] + " not in parameters")
-                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= Constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
+                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
                         return True
                     #Adding meta event    
-                    ind = find_location(event, Constant.meta_event_format)
+                    ind = find_location(event, constant.meta_event_format)
                     if ind :
-                        evt_info = Constant.meta_event_format[ind[0]]
+                        evt_info = constant.meta_event_format[ind[0]]
                         event_id = 0xff
                         meta_event_type = evt_info[0]
                         if event == 'set_tempo':
                             a, b, c = split(kparams.get('tempo'), 3, 8)
-                            self._add_event(MIDI.Track.Event(delta_time=self.delta_time(time), etype= Constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data= bytearray((a, b, c))))
+                            self._add_event(MIDI.Track.Event(delta_time=self.delta_time(time), etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data= bytearray((a, b, c))))
                             return
                         if evt_info[2] == -1:
                             if 'text' in kparams:
@@ -649,10 +677,10 @@ class MIDI:
                                     pass
                                 else : raise ValueError("Attribute " + evt_info[i] + " not in parameters")
 
-                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= Constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data=bytearray(params)))
+                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data=bytearray(params)))
 
                         pass
-                    if event in itertools.chain(*Constant.ch_event_format):
+                    if event in itertools.chain(*constant.ch_event_format):
                         pass
                 else:
                     raise ValueError("Inappropiate Arhument Value, event not of type string")
@@ -710,7 +738,7 @@ class MIDI:
         
         def to_byte_array(self):
             byte_list = bytearray()
-            byte_list.extend(Constant.Mtrk)
+            byte_list.extend(constant.Mtrk)
             # byte_list.append([0] * 4)
             for e in self.trk_event:
                 byte_list.extend(e.to_byte_array())
@@ -730,9 +758,7 @@ class MIDI:
         def min_note(self):
             fre = numpy.trim_zeros(self.note_frequencies())
             return fre[0]
-
             
-
         def notes(self, abs = True, eventtype = None):
             dictn = {}
             res = []
@@ -764,6 +790,11 @@ class MIDI:
                     microsecods = t.get_data()
                     if (timekeeper, microsecods) not in res_bpm: res_bpm += [(timekeeper, microsecods)]
             return {'note_series' : res, 'bpm_change' : res_bpm}  
+        
+        def note(self, index):
+            if isinstance(index, int):
+                return self.trk_event[index]
+            raise IndexError(f"Indexes must be of type int, got of type {type(index)}, index {index}")
 
         def __refresh__(self):
             for t in self.trk_event:
@@ -772,22 +803,28 @@ class MIDI:
         def __repr__(self):
             st = ""
             for e in self.trk_event:
-                st = st +  e.__repr__() + "\n"
+                st = st +  e.__repr__() # + "\n"
             return st
+        
+        def __getitem__(self, index):
+            if isinstance(index, int):
+                return self.note(index)
+            raise IndexError(f"Indexes must be of type int, got of type {type(index)}, index {index}")
 
 
         class Event :
             
             def __init__(self, delta_time = 0, etype = None, event_id = None, meta_event_type = None, length = 0, data = bytearray()):
-                self.delta_time = delta_time
-                self.etype = etype
-                self.event_id = event_id
-                self.meta_event_type = meta_event_type
-                self.length = length
-                self.data = data
-                self.bytes = bytearray()
-                self.abstime = 0
-                self.elength = 0
+                self.delta_time = delta_time # int encoded representing time elapsed from previous event
+                self.etype = etype # str representation for event type, CHANNEL, META, SYS
+                self.event_id = event_id # represent event type code, like 0xFF for Meta Event, 0x8_ - 0xE_ for channel, 0x and 0xF0 , 0xF7 for Sys Event 
+                self.meta_event_type = meta_event_type # represent Meta Sub event code
+                self.length = length # represent length of event, total event length including delta time in bytes
+                self.data = data # stores event data after event id, for Meta dta after Meta Sub Event length in bytes 
+                self.bytes = bytearray() # strores bytes representation of entire event
+                self.abstime = 0 # Only use if Object is of type Absolute Midi, absolute time passed from start in seconds
+                self.elength = 0 # Only use if Object is of type Absolute Midi, total event length in seconds
+                # self.to_byte_array()
 
             def set_date_params(self, params):
                 self.data = bytearray(params)
@@ -799,13 +836,13 @@ class MIDI:
                 return mutils.toint(self.data, 8)
             
             def is_channel_event(self):
-                return self.etype == Constant.CHANNEL_EVENT
+                return self.etype == constant.CHANNEL_EVENT
 
             def is_meta_event(self):
-                return self.etype == Constant.META_EVENT
+                return self.etype == constant.META_EVENT
 
             def is_sys_event(self):
-                return self.etype == Constant.SYS_EVENT
+                return self.etype == constant.SYS_EVENT
             def is_note_on_off_event(self):
                 return 0x7f < self.event_id < 0xa0
 
@@ -816,14 +853,14 @@ class MIDI:
             def ChannelEvent(cls, delta_time, event_id, channel_no = None, params = ()):
                 evti = mutils.ch_event_id(event_id, channel_no) if channel_no is not None else event_id 
                 # print("Ch event  evti : ", evti, ", None : ", channel_no is None)
-                evt = cls(delta_time, Constant.CHANNEL_EVENT, evti)
+                evt = cls(delta_time, constant.CHANNEL_EVENT, evti)
                 evt.data = bytearray(params)
                 return evt
 
             
             @classmethod
             def MetaEvent(cls, delta_time, meta_event_type, params = ()):
-                evt = cls(delta_time, Constant.META_EVENT, 0xff, meta_event_type & 0xff)
+                evt = cls(delta_time, constant.META_EVENT, 0xff, meta_event_type & 0xff)
                 if params is None : return evt
                 elif type(params) == str :                    
                     evt.data = params.encode('utf-8')
@@ -832,7 +869,7 @@ class MIDI:
 
             @classmethod
             def SysEvent(cls, delta_time, event_id, params = ()):
-                evt = cls(delta_time, Constant.SYS_EVENT, event_id & 0xff)
+                evt = cls(delta_time, constant.SYS_EVENT, event_id & 0xff)
                 evt.data = bytearray(params)
                 return evt
             
@@ -840,17 +877,17 @@ class MIDI:
                 byte_list = bytearray()
                 byte_list.extend(mutils.to_var_length(self.delta_time))
                 byte_list.append(self.event_id)
-                if self.etype == Constant.CHANNEL_EVENT:
+                if self.etype == constant.CHANNEL_EVENT:
                     # print("ch : ", self.event_id)
                     # byte_list.pop()
                     # evti = mutils.ch_event_id(self.event_id, self.channel_no)
                     # byte_list.append(evti)
                     pass
-                elif self.etype == Constant.META_EVENT:
+                elif self.etype == constant.META_EVENT:
                     byte_list.append(self.meta_event_type)
                     byte_list.extend(mutils.to_var_length(len(self.data)))
                     pass
-                elif self.etype == Constant.SYS_EVENT:
+                elif self.etype == constant.SYS_EVENT:
                     byte_list.extend(mutils.to_var_length(len(self.data)))
                     pass
                 # print(self.data)
@@ -864,6 +901,45 @@ class MIDI:
                 if data : return len(self.data)
                 return len(self.to_byte_array())
             
+            def to_dict(self):
+                result = {}
+                if self.etype == constant.CHANNEL_EVENT:
+                    result.update({
+                        'type' : X[self.event_id >> 4]['name'],
+                        'deltatime' : self.delta_time, 
+                        'event_id' : self.event_id,
+                        'time' : self.abstime,
+                        'duaration' : self.elength,
+                        'pitch' : self.data[0] if self.event_id >> 4 in [0x8, 0x9] else None,
+                        'velocity' : self.data[1] if self.event_id >> 4 in [0x8, 0x9] else None,
+                        'is_drum' : False if (self.event_id & 0xF) != 10 else True,
+                    })
+                    if self.event_id >> 4 & 0xF == 0xB: 
+                        result.update({'subtype' : X[self.event_id >> 4].get(self.data[0], {}).get("cntrl_name", None)})
+                elif self.etype == constant.META_EVENT:
+                    result.update({
+                        'type' : "meta",
+                        'deltatime' : self.delta_time,
+                        'time' : self.abstime,
+                        'duration' : self.elength,
+                        'subtype' : X[0xFF].get(self.meta_event_type, {}).get("type_name", None),
+                        'length' : len(self.data),
+                        'data' : self.data
+                    })
+                    pass
+                elif self.etype == constant.SYS_EVENT:
+                    result.update({
+                        'type' : X[self.event_id >> 4]['name'],
+                        'deltatime' : self.delta_time,
+                        'event_id' : self.event_id,
+                        'time' : self.abstime,
+                        'duration' : self.elength,
+                        'length' : len(self.data),
+                        'data' : self.data
+                    })
+                    pass
+                return result
+
             def __repr__(self):
                 # print("E--> ", hex_string)
                 # mhxmet = hex(self.meta_event_type) if self.meta_event_type else '0'

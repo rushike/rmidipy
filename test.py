@@ -1,6 +1,6 @@
 from rmidi import mutils
-from rmidi.MIDI import MIDI
-from rmidi.absolutemidi import AbsoluteMidi
+from rmidi import MIDI
+from rmidi import AbsoluteMidi
 from rmidi import rmidix
 from rmidi import analyser
 import numpy, random
@@ -10,26 +10,12 @@ from rmidi.dataset import piano_roll
 '''
 MIDI Object Testing
 '''
-# import os
+import os
 
-# y = MIDI.parse_midi('check.mid')
-# print(y)
-# tr = y.track(0)
-
-# no = tr.notes()
-
-
-
-# y.compress('check')
-
-# # y.create_file('check')
-
-# e = mutils.file_hash('./midis/Believer_-_Imagine_Dragons.mid')
-
-# d = mutils.file_hash('check.mid')
-
-# print(e, ", ", d , " : ", e == d)
-
+def test_open_midi_file(filename = 'check.mid'):
+    y = MIDI.parse_midi(filename)
+    print(y)
+# test_open_midi_file()
 
 '''
 Sequence
@@ -57,27 +43,25 @@ midi_to_note testing from mutuls
 21 -> c0
 60 -> c4
 """
-# y = mutils.midi_to_note([56, 56, 78, 98, 34, 54, 95])
-
-# y2 = mutils.midi_to_note(60)
-
-# y == y2
+def test_midi_to_note(number = 60, array = [56, 56, 78, 98, 34, 54, 95]):
+    y = mutils.midi_to_note(array)
+    y2 = mutils.midi_to_note(number)
+    print(f"array conversion {y}, number conversion {y2}")
+# test_midi_to_note()
 
 """
 Testing the set_tempo of MIDI
 """
-
-# x = MIDI.parse_midi('.\\rmidi\\default.mid')
-
-# x.track(0).set_tempo(0, 256)
-# notes = [56, 58, 60, 61, 63, 65, 67, 68]
-# dtime = 1
-# for i in range(len(notes)):
-#     # print("tm, nt = ", dtime[i], notes[i])
-#     x.track(0).add_event(0, 'note_on', note_number = notes[i], velocity = 90, channel_no = 0)
-#     x.track(0).add_event(dtime, 'note_on', note_number = notes[i], velocity = 0, channel_no = 0)
-        
-# x.compress('..\\dataset\\midi_gen\\tempo_change')
+def test_midi_tempo_change(filepath = './rmidi/default.mid'):
+    x = MIDI.parse_midi(filepath)
+    x.track(0).set_tempo(0, 256)
+    notes = [56, 58, 60, 61, 63, 65, 67, 68]
+    dtime = 1
+    for i in range(len(notes)):
+        x.track(0).add_event(0, 'note_on', note_number = notes[i], velocity = 90, channel_no = 0)
+        x.track(0).add_event(dtime, 'note_on', note_number = notes[i], velocity = 0, channel_no = 0)
+            
+    x.compress('../dataset/midi_gen/tempo_change')
 
 
 """
@@ -172,12 +156,12 @@ Testing AbsMIDI
 # f = '..\\dataset\\midi_gen\\Believer_Imagine_Dragons.mid'
 
 # g = MIDI.parse_midi(f)
-y = MIDI.parse_midi('check.mid')
-
-abst = AbsoluteMidi.to_abs_midi(y)
-sbty = abs(y)
-print(abst)
-# 1 == 0
+def test_abs_midi(filepath = 'check.mid'):
+    y = MIDI.parse_midi(filepath)
+    abst = AbsoluteMidi.to_abs_midi(y)
+    sbty = abs(y)
+    print(abst)
+    print(sbty)
 
 '''
 Testing Track Analysis from analyser, Can extend to multiple midi
@@ -281,6 +265,35 @@ note frequencies
 # plt.show()
 
 
+"""
+testing array like indexing
+m = MIDI.parse_midi(file_path)
+track1 = m[0] 
+"""
+def test_array_like_indexing(filepath = 'check.mid'):
+    m = MIDI.parse_midi(filepath)
+    le = len(m) # getting length of midi(no. of tracks)
+    for i in range(le):
+        print(f"N:{i + 1}th = track : {m[0]}")
+# test_array_like_indexing()
 
 
+"""
+Collating event format
+"""
+def test_event_format_struct():
+    from  rmidi.constant import X
+    print(X)
+# test_event_format_struct()
 1 == 0
+
+
+"""
+Testing NoteSequence
+"""
+
+def test_note_sequence(filepath = 'check.mid'):
+    from rmidi.dataset import NoteSequence
+    ns = NoteSequence(filepath)
+    print(ns)
+test_note_sequence()

@@ -1,7 +1,7 @@
 from rmidi.dataset import config
 from rmidi import mutils
-from rmidi.MIDI import MIDI
-from rmidi.absolutemidi import AbsoluteMidi
+from rmidi import MIDI
+from rmidi import AbsoluteMidi
 from rmidi.constant import converter
 import numpy
 

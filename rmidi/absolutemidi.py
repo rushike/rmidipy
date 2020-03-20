@@ -1,4 +1,4 @@
-from rmidi.MIDI import MIDI
+from rmidi import MIDI
 import copy
 from rmidi import mutils
 class AbsoluteMidi(MIDI):
@@ -72,7 +72,6 @@ class AbsoluteMidi(MIDI):
         # le = len(mstr)
         # print(le, "  last : ", mstr[le - 1000: le])
         return mstr
-        
 
     class AbsoluteTrack(MIDI.Track):
         def __init__(self, midi, empty=False):

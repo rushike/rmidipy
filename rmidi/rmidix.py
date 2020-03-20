@@ -1,4 +1,4 @@
-from rmidi.MIDI import *
+from rmidi import *
 import math, itertools
 from rmidi import mutils
 class Muse:

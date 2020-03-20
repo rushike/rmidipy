@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-from rmidi.MIDI import MIDI, Constant
+from rmidi import MIDI, constant
 from rmidi.mutils import channel as mchannel
 from rmidi import mutils
-from rmidi.absolutemidi import AbsoluteMidi
+from rmidi import AbsoluteMidi
 from rmidi.constant import converter
 import glob, os
 import numpy

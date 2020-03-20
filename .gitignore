@@ -1,9 +1,9 @@
 .vscode
 *.ipynb_*
 *__pycache__*
-env/*
-dist/*
-build/*
-rmidi.egg-info/*
+env
+dist
+build
+rmidi.egg-info
 *.tans
 *.mid

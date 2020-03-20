@@ -134,12 +134,22 @@ def find_location(text, listt):
     except StopIteration:
         return None
 
-# @param num byte array to be converted
-# @param type type : big-endian or small-endian
-# @param group no. of bytes in group
-# @param length length of line(in bytes)
-# @return
+
 def hexstr(bnum: bytearray, leng = 0, group = 0, numlen = 2, ftype = 0):
+    """ Hexadecimal string of bytearray
+    
+    Arguments:
+        bnum {bytearray} -- num byte array to be converted
+    
+    Keyword Arguments:
+        leng {int} -- [description] (default: {0})
+        group {int} -- no. of bytes in group (default: {0})
+        numlen {int} -- [description] (default: {2})
+        ftype {int} -- [description] (default: {0})
+    
+    Returns:
+        [str] -- hex string
+    """
     if ftype == 1: bnum = bnum.reverse()
     if group == 0: group = len(bnum)
     if leng == 0: leng = len(bnum)    
