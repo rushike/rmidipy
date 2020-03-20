@@ -285,7 +285,7 @@ def test_event_format_struct():
     from  rmidi.constant import X
     print(X)
 # test_event_format_struct()
-1 == 0
+
 
 
 """
@@ -296,4 +296,27 @@ def test_note_sequence(filepath = 'check.mid'):
     from rmidi.dataset import NoteSequence
     ns = NoteSequence(filepath)
     print(ns)
-test_note_sequence()
+# test_note_sequence()
+
+"""
+To notes testing, ns.notes 
+"""
+
+def test_ns_notes(filepath = 'check.mid'):
+    from rmidi.dataset import NoteSequence
+    ns = NoteSequence(filepath)
+    print(f"Notes : {ns.tostring(ns.notes)}")
+# test_ns_notes()
+
+"""
+Order by testing of notesequence,
+order by is intended to work to order_by , 'time', 'duration', 'pitch', deltatime 
+only on work on notes 
+"""
+def test_order_by_ns(filepath = 'check.mid'):
+    from rmidi.dataset import NoteSequence
+    ns = NoteSequence(filepath)
+    ordered = ns.order_by('pitch', reverse=True)
+    print(f"order by attribute : time , seq : {ns.tostring(ordered)}")
+test_order_by_ns()
+1 == 0

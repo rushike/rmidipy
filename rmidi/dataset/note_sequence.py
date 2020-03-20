@@ -3,7 +3,9 @@ from rmidi import mutils
 from rmidi import MIDI
 from rmidi import AbsoluteMidi
 from rmidi.constant import converter
+
 import numpy, json, pickle
+from collections import OrderedDict
 
 class NoteSequence:
     def __init__(self, midi):
@@ -23,7 +25,30 @@ class NoteSequence:
 
     @property
     def notes(self):
-        pass
+        seq = {}
+        for i, track in self.seq.items():
+            seq[i] = {}
+            for j, event in track.items():
+                if event.get("type", "None") in ["note_on", "note_off"]:
+                    seq[i][j] = self.seq[i][j]
+        return seq
+
+    def order_by(self, attribute, reverse = False):
+        """For now it support order by of only int or string attribute of event
+        order by is intended to work for attributes 'time', 'duration', 'pitch', deltatime
+        Arguments:
+            attribute {str} -- attribute name
+        """
+        ordered_notes = self.notes
+        seq = {}
+        for i, track in ordered_notes.items():
+            seq[i] = OrderedDict(sorted(track.items(), key = lambda x: x[1][attribute], reverse=reverse))
+        
+        print(f"dict : {seq}")
+        return seq
+
+    def to_rmidi(self):
+        raise NotImplementedError("Method/Function is yet to be implemented")
 
     @classmethod
     def parse(cls, midi : AbsoluteMidi, notes = False):
@@ -45,12 +70,18 @@ class NoteSequence:
         pass
         return seq
 
-    def to_rmidi(self):
-        raise NotImplementedError("Method/Function is yet to be implemented")
-
-    def __str__(self):
-        seqlist = list(map( lambda trackitem : {f"track-{trackitem[0]}" : list(map(lambda eventitem: list(map(lambda item:  f"{item[0]} : {mutils.hexstr(item[1])}" if item[0] == 'data' else f"{item[0]} : {item[1]}", 
-                        eventitem[1].items() )), trackitem[1].items()))} , self.seq.items()))
+    @classmethod
+    def tostring(cls, seq):
+        seqlist = list(map( lambda trackitem : {f"track-{trackitem[0]}" : list(map(lambda eventitem: 
+                    list(map(lambda item:  f"{item[0]} : {mutils.hexstr(item[1])}" if item[0] == 'data' else f"{item[0]} : {item[1]}", 
+                    eventitem[1].items() )), trackitem[1].items()))} , seq.items()))
+        return json.dumps(seqlist, indent=4, )
+    
+    def __str__(self, seq = None):
+        seq = seq if seq else self.seq
+        seqlist = list(map( lambda trackitem : {f"track-{trackitem[0]}" : list(map(lambda eventitem: 
+                    list(map(lambda item:  f"{item[0]} : {mutils.hexstr(item[1])}" if item[0] == 'data' else f"{item[0]} : {item[1]}", 
+                    eventitem[1].items() )), trackitem[1].items()))} , seq.items()))
         return json.dumps(seqlist, indent=4, )
     
     def __repr__(self):

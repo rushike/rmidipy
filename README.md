@@ -319,3 +319,200 @@ Absolute Midi is defined as its time from start, in seconds.
     }
 ]
 ```
+### NoteSequence@`notes`
+To get just notes, i.e. just **note_on** and **note_off** event, you can call `NoteSequence` object as `ns.notes`
+```python
+from rmidi.dataset import NoteSequence
+ns = NoteSequence(<midi-file-path>)
+notes = ns.notes
+print(f"{notes}")
+print(f"{ns.tostring(notes)}") # to pretty print
+```
+**Output**
+```
+ [
+    {
+        "track-0": [
+            [
+                "type : note_on",
+                "deltatime : 0",
+                "event_id : 144",
+                "time : 0.0",
+                "duaration : 31.649305555555554",
+                "pitch : 72",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 33.33333333333333",
+                "duaration : 31.649305555555557",
+                "pitch : 74",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 66.66666666666666",
+                "duaration : 31.649305555555557",
+                "pitch : 76",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 99.99999999999999",
+                "duaration : 31.649305555555557",
+                "pitch : 77",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 133.33333333333331",
+                "duaration : 31.649305555555543",
+                "pitch : 79",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 166.66666666666663",
+                "duaration : 31.649305555555543",
+                "pitch : 81",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 199.99999999999994",
+                "duaration : 31.649305555555543",
+                "pitch : 83",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 233.33333333333326",
+                "duaration : 31.649305555555543",
+                "pitch : 84",
+                "velocity : 80",
+                "is_drum : False"
+            ]
+        ]
+    }
+]
+```
+
+### Notesequence@`order_by`
+It orders the events within track base on event attribute, order by is intended to work for attributes 'time', 'duration', 'pitch', deltatime
+```python
+from rmidi.dataset import NoteSequence
+ns = NoteSequence(filepath)
+ordered = ns.order_by(<attribute_name>, reverse=True)
+print(f"ordered") # Output for pitch sorted in reverse
+```
+
+**Output**
+```
+[
+    {
+        "track-0": [
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 233.33333333333326",
+                "duaration : 31.649305555555543",
+                "pitch : 84",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 199.99999999999994",
+                "duaration : 31.649305555555543",
+                "pitch : 83",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 166.66666666666663",
+                "duaration : 31.649305555555543",
+                "pitch : 81",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 133.33333333333331",
+                "duaration : 31.649305555555543",
+                "pitch : 79",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 99.99999999999999",
+                "duaration : 31.649305555555557",
+                "pitch : 77",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 66.66666666666666",
+                "duaration : 31.649305555555557",
+                "pitch : 76",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 97",
+                "event_id : 144",
+                "time : 33.33333333333333",
+                "duaration : 31.649305555555557",
+                "pitch : 74",
+                "velocity : 80",
+                "is_drum : False"
+            ],
+            [
+                "type : note_on",
+                "deltatime : 0",
+                "event_id : 144",
+                "time : 0.0",
+                "duaration : 31.649305555555554",
+                "pitch : 72",
+                "velocity : 80",
+                "is_drum : False"
+            ]
+        ]
+    }
+]
+```
