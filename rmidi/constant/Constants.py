@@ -51,6 +51,8 @@ SCALE_KEY_SIG_DEFAULT =  {'c-major' : 0, 'c#-major' : 7, 'd-major' : 2, 'd#-majo
                     'g-minor' : 10, 'g#-minor' : 5 , 'a-minor' : 0, 'a#-minor' : 7 , 'b-minor' : 2 
                     }
 
+ch_events = ("note_off", "note_on", "after_touch", "controller", "program_change", "channel_after_touch", "pitch_bend")
+
 #format = (id, sub_event_name, param_len, params..., param_type)
 ch_event_format = (
                     (0x8, "note_off", 2, "note_number", "velocity", "int"),
@@ -61,6 +63,10 @@ ch_event_format = (
                     (0xD, "channel_after_touch", 1, "amount", "int"),                   
                     (0xE, "pitch_bend", 2, "vlsb", "vmsb", "int")                  
                 )
+
+meta_events = ('sequence_number', 'text_event', 'copyright_notice', 'track_name', 
+            'instrument_name', 'lyrics', 'marker', 'cue_point', 'midi_ch_prefix', 'midi_port', 
+            'end_of_track', 'set_tempo', 'smpte_offset', 'time_sig', 'key_sig', 'sequence_specifier')
 #format = (id, "sub_event_name", "param_len", params..., "param_type", "common_range, -1", //if -1, highest_allowed_val_of_param..., -1, "mask")
 #If -1 in place of common range the following param len args are highesh values of parameters
 #If all within mask positive else masked negative
@@ -82,6 +88,9 @@ meta_event_format = (
                         (0x59, "key_sig", 2, "key", "scale", "int" , 15, 1 ),
                         (0x7F, "sequence_specifier", -1, "data", "any")
                     )
+
+sys_events = ("normal_sys_event", "authorization_sys_event")
+
 sys_event_format = (
                         (0xF0, "normal_sys_event", -1, "data", "int", 128),
                         (0xF7, "authorization_sys_event", -1, "data", "int", 256),

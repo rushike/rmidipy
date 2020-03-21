@@ -717,6 +717,9 @@ class MIDI:
             end = self.trk_event.pop()
             self.trk_event.append(MIDI.Track.Event.ChannelEvent(self.delta_time(note_length), 0x8, channel_no, (note_val, 0x30)))
             self.trk_event.append(end)
+            
+        def end_track(self):
+            self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x2f, None))
         
         def delta_time(self, note_length):#Computes the delta time from tradition note duration, full, half, quater 
             """ Computes the delta time from tradition note duration, full, half, quater 
@@ -909,7 +912,7 @@ class MIDI:
                         'deltatime' : self.delta_time, 
                         'event_id' : self.event_id,
                         'time' : self.abstime,
-                        'duaration' : self.elength,
+                        'duration' : self.elength,
                         'is_drum' : False if (self.event_id & 0xF) != 10 else True,
                     })
                     if self.event_id >> 4 in [0x8, 0x9] :

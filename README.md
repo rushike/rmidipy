@@ -17,7 +17,7 @@ In same structure __*rmidi*__  has `MIDI` as base class, `MIDI.Track` for track 
 ```
 
 **OUTPUT**
-``` HTML_____________________________________________________________________________________________________________________________ . . .
+```_____________________________________________________________________________________________________________________________ . . .
 | Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
 |______________________________________________________________________________________________________________________________ . . .
 | 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08
@@ -525,6 +525,7 @@ It orders the events within track base on event attribute, order by is intended 
 
 **Output**
 ```
+$
 [
     {
         "track-0": [
@@ -611,4 +612,17 @@ It orders the events within track base on event attribute, order by is intended 
         ]
     }
 ]
+```
+
+### Notesequence@`to_abs_midi`
+Convert `NoteSequece` to `AbsoluteMidi` object.
+```python
+>>> from rmidi.dataset import NoteSequence
+>>> ns = NoteSequence(filepath)
+>>> absmidi = ns.to_abs_midi()
+>>> print(type(absmidi))
+```
+**Output**
+```$
+<class 'rmidi.absolutemidi.AbsoluteMidi'>
 ```

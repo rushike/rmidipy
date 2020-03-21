@@ -327,6 +327,6 @@ def test_ns_to_rmidi(filepath = 'check.mid'):
     from rmidi.dataset import NoteSequence
     ns = NoteSequence(filepath)
     absmidi = ns.to_abs_midi()
-    print(absmidi)
+    print(type(absmidi))
 test_ns_to_rmidi()
 1 == 0

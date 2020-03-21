@@ -785,7 +785,7 @@ X = {
             'id': 11,
             'length': 2,
             'mask': 127,
-            'name' : 'cntroller',
+            'name' : 'controller',
             'params': ['controller_type', 'value']
         },
     12: {'id': 12,

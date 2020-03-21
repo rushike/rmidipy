@@ -1,4 +1,6 @@
-from rmidi import MIDI, constant
+from rmidi import MIDI
+from rmidi import constant
+from rmidi.constant import *
 import copy
 from rmidi import mutils
 class AbsoluteMidi(MIDI):
@@ -13,7 +15,7 @@ class AbsoluteMidi(MIDI):
         abtime = 0
         tempo = 500000
         time_div = absmidi.time_div
-        event_trk = [MIDI.Track(absmidi, empty= True) for _ in range(absmidi.track_count)]
+        event_trk = [AbsoluteMidi.AbsoluteTrack(absmidi, empty= True) for _ in range(absmidi.track_count)]
         # print(event_trk[0] is event_trk[1])
         for i, t in enumerate(absmidi.tracks):
             trk = event_trk[i]
@@ -51,7 +53,6 @@ class AbsoluteMidi(MIDI):
         # print(tempo)
         amidi = cls(absmidi.format_type, absmidi.track_count, absmidi.track_count, tempo = tempo)
         amidi.tracks = event_trk
-
         return amidi
 
     def __repr__(self):
@@ -79,8 +80,12 @@ class AbsoluteMidi(MIDI):
         def __init__(self, midi, empty=False):
             super().__init__(midi, empty=empty)
 
-        def add_events_from_dict(self, **kparams):
-            raise NotImplementedError(f"Not Implemented Error")
+        def _add_event(self, evt):
+            self.trk_event.append(evt)
+
+        def add_events_from_dict(self, trackdict = {}):
+            for _, event in trackdict.items():
+                self._add_event(AbsoluteMidi.AbsoluteTrack.AbsoluteEvent.from_dict(**event))
 
         class AbsoluteEvent(MIDI.Track.Event):
             def __init__(self, delta_time=0, etype=None, event_id=None, meta_event_type=None, length=0, data=bytearray()):
@@ -90,11 +95,20 @@ class AbsoluteMidi(MIDI):
             def from_dict(cls, **kparams):
                 if not {"time", "duration", "type", "deltatime"} < set(kparams):
                     raise AttributeError(f"Attribute dict not of correct format : {kparams}")
-                if constant.sCHANNEL_EVENT in kparams["type"]:
-                    print(f"Class CHANNEL_EVENT_METHOD : {cls.ChannelEvent}")
-                elif constant.sMETA_EVENT in kparams["type"]:
-                    print(f"Class META_EVENT_METHOD : {cls.MetaEvent}")
-                elif constant.sSYS_EVENT in kparams['type']:
-                    print(f"Class META_EVENT_METHOD : {cls.SysEvent}")
+                subtype = kparams.get('subtype', "None")
+                if kparams["type"] in ch_events:
+                    # for now data is specially note_on or note_off event
+                    data = kparams["data"] if "data" in kparams else [kparams["pitch"], kparams["velocity"]]
+                    event = cls.ChannelEvent(delta_time = kparams["deltatime"], event_id = kparams["event_id"], 
+                            params=data)
+                elif kparams["type"] in sMETA_EVENT: # checking type is meta, since all meta event has same event id
+                    if subtype in meta_events:
+                        index, _ = mutils.find_location(subtype, constant.meta_event_format)
+                        event = cls.MetaEvent(delta_time = kparams["deltatime"], meta_event_type=constant.meta_event_format[index][0], params= kparams["data"])
+                    else: raise AttributeError(f"Do not have appropiate <Meta.subtype>, subtype : {kparams.get('subtype', 'None')}")
+                elif kparams['type'] in sys_events:
+                        event = cls.SysEvent(delta_time = kparams["deltatime"], event_id = kparams["event_id"], params=kparams["data"])
                 else: raise AttributeError(f"kparams <type> param invalid, type : {kparams['type']}")
-
+                event.abstime = kparams["time"]
+                event.elength = kparams["duration"]
+                return event

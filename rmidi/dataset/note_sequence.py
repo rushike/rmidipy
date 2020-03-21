@@ -18,7 +18,7 @@ class NoteSequence:
             if midi.endswith(('.mid', '.midi')):
                 midi = abs(MIDI.parse_midi(midi))
             else : raise AttributeError(f"Attribute <midi> not a midi file path, path >> {midi}")
-        
+            
         # till here midi is translated to rmidi.MIDI or rmidi.AbsoluteMidi object
         self.seq = NoteSequence.parse(midi)
         
@@ -49,15 +49,10 @@ class NoteSequence:
 
     def to_abs_midi(self):
         tracks = len(self)
-        midi = AbsoluteMidi(format_type= 1, track_count = tracks, time_div=0x1e0, empty = True)
-        
+        midi = AbsoluteMidi.to_abs_midi(MIDI(format_type= 1, track_count = tracks, time_div=0x1e0, empty = True))
         for i, track in self.seq.items():
-            for j, event in track.items():
-                print(f"event : {event}")
-                midi = AbsoluteMidi.AbsoluteTrack.AbsoluteEvent.from_dict(**event)
-            pass
-
-        raise NotImplementedError("Method/Function is yet to be implemented")
+            midi.track(i).add_events_from_dict(track)
+        return midi
 
     @classmethod
     def parse(cls, midi : AbsoluteMidi, notes = False):
@@ -74,9 +69,6 @@ class NoteSequence:
             seq[i] = {}
             for j, event in enumerate(track):
                 seq[i][j] = event.to_dict()
-
-            pass
-        pass
         return seq
 
     @classmethod
