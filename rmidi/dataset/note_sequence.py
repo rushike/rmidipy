@@ -47,7 +47,16 @@ class NoteSequence:
         print(f"dict : {seq}")
         return seq
 
-    def to_rmidi(self):
+    def to_abs_midi(self):
+        tracks = len(self)
+        midi = AbsoluteMidi(format_type= 1, track_count = tracks, time_div=0x1e0, empty = True)
+        
+        for i, track in self.seq.items():
+            for j, event in track.items():
+                print(f"event : {event}")
+                midi = AbsoluteMidi.AbsoluteTrack.AbsoluteEvent.from_dict(**event)
+            pass
+
         raise NotImplementedError("Method/Function is yet to be implemented")
 
     @classmethod
@@ -77,6 +86,9 @@ class NoteSequence:
                     eventitem[1].items() )), trackitem[1].items()))} , seq.items()))
         return json.dumps(seqlist, indent=4, )
     
+    def __len__(self):
+        return len(self.seq)
+
     def __str__(self, seq = None):
         seq = seq if seq else self.seq
         seqlist = list(map( lambda trackitem : {f"track-{trackitem[0]}" : list(map(lambda eventitem: 

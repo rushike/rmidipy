@@ -318,5 +318,15 @@ def test_order_by_ns(filepath = 'check.mid'):
     ns = NoteSequence(filepath)
     ordered = ns.order_by('pitch', reverse=True)
     print(f"order by attribute : time , seq : {ns.tostring(ordered)}")
-test_order_by_ns()
+# test_order_by_ns()
+
+"""
+NoteSequence to rmidi testing
+"""
+def test_ns_to_rmidi(filepath = 'check.mid'):
+    from rmidi.dataset import NoteSequence
+    ns = NoteSequence(filepath)
+    absmidi = ns.to_abs_midi()
+    print(absmidi)
+test_ns_to_rmidi()
 1 == 0

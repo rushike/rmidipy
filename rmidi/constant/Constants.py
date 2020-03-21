@@ -4,8 +4,11 @@ META_EVENT_END = (0x01, 0xff, 0x2f, 0x0)
 MAX = 1048576
 DTYPE = {'uint4': (0, 16), 'uint7': (0, 127), 'uint8' : (0, 256)}
 CHANNEL_EVENT = 'CHANNEL'
+sCHANNEL_EVENT = 'channel'
 META_EVENT = 'META'
+sMETA_EVENT = 'meta'
 SYS_EVENT = 'SYS'
+sSYS_EVENT = 'sys'
 
 SCALE = ['c-major', 'c#-major', 'd-major', 'd#-major', 'e-major', 'f-major', 'f#-major', 
             'g-major', 'g#-major', 'a-major', 'a#-major', 'b-major', 

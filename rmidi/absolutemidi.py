@@ -1,4 +1,4 @@
-from rmidi import MIDI
+from rmidi import MIDI, constant
 import copy
 from rmidi import mutils
 class AbsoluteMidi(MIDI):
@@ -72,12 +72,29 @@ class AbsoluteMidi(MIDI):
         # le = len(mstr)
         # print(le, "  last : ", mstr[le - 1000: le])
         return mstr
+    def to_rmidi(self):
+        raise NotImplementedError("Not implemeted till now")
 
     class AbsoluteTrack(MIDI.Track):
         def __init__(self, midi, empty=False):
             super().__init__(midi, empty=empty)
 
+        def add_events_from_dict(self, **kparams):
+            raise NotImplementedError(f"Not Implemented Error")
+
         class AbsoluteEvent(MIDI.Track.Event):
             def __init__(self, delta_time=0, etype=None, event_id=None, meta_event_type=None, length=0, data=bytearray()):
                     super().__init__(delta_time=delta_time, etype=etype, event_id=event_id, meta_event_type=meta_event_type, length=length, data=data)
+            
+            @classmethod
+            def from_dict(cls, **kparams):
+                if not {"time", "duration", "type", "deltatime"} < set(kparams):
+                    raise AttributeError(f"Attribute dict not of correct format : {kparams}")
+                if constant.sCHANNEL_EVENT in kparams["type"]:
+                    print(f"Class CHANNEL_EVENT_METHOD : {cls.ChannelEvent}")
+                elif constant.sMETA_EVENT in kparams["type"]:
+                    print(f"Class META_EVENT_METHOD : {cls.MetaEvent}")
+                elif constant.sSYS_EVENT in kparams['type']:
+                    print(f"Class META_EVENT_METHOD : {cls.SysEvent}")
+                else: raise AttributeError(f"kparams <type> param invalid, type : {kparams['type']}")
 

@@ -910,10 +910,18 @@ class MIDI:
                         'event_id' : self.event_id,
                         'time' : self.abstime,
                         'duaration' : self.elength,
-                        'pitch' : self.data[0] if self.event_id >> 4 in [0x8, 0x9] else None,
-                        'velocity' : self.data[1] if self.event_id >> 4 in [0x8, 0x9] else None,
                         'is_drum' : False if (self.event_id & 0xF) != 10 else True,
                     })
+                    if self.event_id >> 4 in [0x8, 0x9] :
+                        result.update({
+                            'pitch' : self.data[0],
+                            'velocity' : self.data[1]
+                        })
+                    else:
+                        result.update({
+                            "length" : len(self.data),
+                            'data' : self.data
+                        })
                     if self.event_id >> 4 & 0xF == 0xB: 
                         result.update({'subtype' : X[self.event_id >> 4].get(self.data[0], {}).get("cntrl_name", None)})
                 elif self.etype == constant.META_EVENT:
