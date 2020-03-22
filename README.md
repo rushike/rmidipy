@@ -20,58 +20,32 @@ In same structure __*rmidi*__  has `MIDI` as base class, `MIDI.Track` for track 
 ```_____________________________________________________________________________________________________________________________ . . .
 | Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
 |______________________________________________________________________________________________________________________________ . . .
-| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08
-
-| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x00
-
-| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x20
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x00
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x00
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x64
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x40
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x00
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x00
-
-| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x00
-
-| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x00
-
-| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50
-
-| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x00
-
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x0
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x59  | 0x2        |  0x00  0x0
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x51  | 0x3        |  0x07  0xa1 0x2
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x79  0x0
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xc0       | 0     | 0x1        |  0x0
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x07  0x6
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x0a  0x4
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5b  0x0
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0xb0       | 0     | 0x2        |  0x5d  0x0
+| 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x21  | 0x1        |  0x0
+| 0.000000        | 0.000000        | 0x0         | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x48  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4a  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4c  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4d  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x4f  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x51  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x53  0x0
+| 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x5
+| 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x0
 | 0.000000        | 0.000000        | 0x1         | META       | 0xff       | 0x2f  | 0x0        |
 ```
 
@@ -112,7 +86,7 @@ Absolute Midi is defined as its time from start, in seconds.
 ```
 
 ## NoteSequence
-`rmidi.dataset.NoteSequence` is simliar object to that of `Magenta.NoteSequence`, It holds everthing in dict, whole midi file is express as ***python nested dictionary***
+`rmidi.dataset.NoteSequence` is similar object to that of `Magenta.NoteSequence`, It holds everthing in dict, whole midi file is express as ***python nested dictionary***
 
 ```python
 >>> from rmidi.dataset import notesequence
@@ -121,6 +95,7 @@ Absolute Midi is defined as its time from start, in seconds.
 ```
 
 **Output**
+<details>
 ```
 [
     {
@@ -319,6 +294,8 @@ Absolute Midi is defined as its time from start, in seconds.
     }
 ]
 ```
+</details>
+
 ### NoteSequence@`tostring`
 Converts the dict to pretty string
 ```python
@@ -327,7 +304,8 @@ dict_ = {0: OrderedDict([(17, {'type': 'note_on', 'deltatime': 97, 'event_id': 1
 print(NoteSequence.tostring(dict_))
 ``` 
 **Output**
-```
+<details>
+    ```
 [
     {
         "track-0": [
@@ -415,6 +393,8 @@ print(NoteSequence.tostring(dict_))
     }
 ]
 ```
+</details>
+
 ### NoteSequence@`notes`
 To get just notes, i.e. just **note_on** and **note_off** event, you can call `NoteSequence` object as `ns.notes`
 ```python
