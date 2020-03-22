@@ -10,7 +10,7 @@ setuptools.setup(
     name="rmidi",
     version="0.0.31",
     # scripts = ['MIDI.py', 'mutils.py', 'rmidi.py', 'sound.py'],
-    packages= setuptools.find_packages() # ['rmidi', 'rmidi.constant', 'rmidi.dataset'],
+    packages= setuptools.find_packages(), # ['rmidi', 'rmidi.constant', 'rmidi.dataset'],
     author="rushike",
     author_email="rushike.ab1@gmail.com",
     description="Math Sequence to MIDI",
