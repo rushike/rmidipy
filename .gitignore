@@ -7,3 +7,4 @@ build
 rmidi.egg-info
 *.tans
 *.mid
+.pypirc

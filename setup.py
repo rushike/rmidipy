@@ -4,13 +4,13 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", 'r') as req:
-    req_list = req.read().encode('utf8').split()
+    req_list = req.read().split()
 
 setuptools.setup(
     name="rmidi",
-    version="0.0.30",
+    version="0.0.31",
     # scripts = ['MIDI.py', 'mutils.py', 'rmidi.py', 'sound.py'],
-    packages=['rmidi', 'rmidi.constant', 'rmidi.dataset'],
+    packages= setuptools.find_packages() # ['rmidi', 'rmidi.constant', 'rmidi.dataset'],
     author="rushike",
     author_email="rushike.ab1@gmail.com",
     description="Math Sequence to MIDI",
