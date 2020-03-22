@@ -93,10 +93,9 @@ Absolute Midi is defined as its time from start, in seconds.
 >>> ns = NoteSequence(<midi-file-path>)
 >>> print(ns)
 ```
-
-**Output**
 <details>
-```
+<summary>Output</summary>
+<pre style = "height:40rem">
 [
     {
         "track-0": [
@@ -293,7 +292,7 @@ Absolute Midi is defined as its time from start, in seconds.
         ]
     }
 ]
-```
+</pre>
 </details>
 
 ### NoteSequence@`tostring`
@@ -303,10 +302,9 @@ from rmidi.dataset import NoteSequence
 dict_ = {0: OrderedDict([(17, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 233.33333333333326, 'duaration': 31.649305555555543, 'pitch': 84, 'velocity': 80, 'is_drum': False}), (16, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 199.99999999999994, 'duaration': 31.649305555555543, 'pitch': 83, 'velocity': 80, 'is_drum': False}), (15, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 166.66666666666663, 'duaration': 31.649305555555543, 'pitch': 81, 'velocity': 80, 'is_drum': False}), (14, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 133.33333333333331, 'duaration': 31.649305555555543, 'pitch': 79, 'velocity': 80, 'is_drum': False}), (13, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 99.99999999999999, 'duaration': 31.649305555555557, 'pitch': 77, 'velocity': 80, 'is_drum': False}), (12, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 66.66666666666666, 'duaration': 31.649305555555557, 'pitch': 76, 'velocity': 80, 'is_drum': False}), (11, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 33.33333333333333, 'duaration': 31.649305555555557, 'pitch': 74, 'velocity': 80, 'is_drum': False}), (10, {'type': 'note_on', 'deltatime': 0, 'event_id': 144, 'time': 0.0, 'duaration': 31.649305555555554, 'pitch': 72, 'velocity': 80, 'is_drum': False})])}
 print(NoteSequence.tostring(dict_))
 ``` 
-**Output**
 <details>
-    ```
-[
+<summary>Output</summary>
+<pre style = "height:40rem">[
     {
         "track-0": [
             [
@@ -392,7 +390,7 @@ print(NoteSequence.tostring(dict_))
         ]
     }
 ]
-```
+</pre>
 </details>
 
 ### NoteSequence@`notes`
@@ -404,8 +402,9 @@ To get just notes, i.e. just **note_on** and **note_off** event, you can call `N
 >>> print(notes)
 >>> print(ns.tostring(notes)) # to pretty print
 ```
-**Output**
-```
+<details>
+<summary>Output</summary>
+<pre style = "height:40rem">
  [
     {
         "track-0": [
@@ -492,7 +491,8 @@ To get just notes, i.e. just **note_on** and **note_off** event, you can call `N
         ]
     }
 ]
-```
+</pre>
+</details>
 
 ### Notesequence@`order_by`
 It orders the events within track base on event attribute, order by is intended to work for attributes 'time', 'duration', 'pitch', deltatime
@@ -504,8 +504,9 @@ It orders the events within track base on event attribute, order by is intended 
 ```
 
 **Output**
-```
-$
+<details>
+<summary>Output</summary>
+<pre style = "height:40rem">
 [
     {
         "track-0": [
@@ -592,7 +593,8 @@ $
         ]
     }
 ]
-```
+</pre>
+</details>
 
 ### Notesequence@`to_abs_midi`
 Convert `NoteSequece` to `AbsoluteMidi` object.
@@ -603,6 +605,6 @@ Convert `NoteSequece` to `AbsoluteMidi` object.
 >>> print(type(absmidi))
 ```
 **Output**
-```$
+```
 <class 'rmidi.absolutemidi.AbsoluteMidi'>
 ```
