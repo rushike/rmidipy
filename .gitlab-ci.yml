@@ -13,7 +13,7 @@ deploy_staging:
     TWINE_USERNAME: $STAGING_USERNAME
     TWINE_PASSWORD: $STAGING_PASSWORD
   script:
-    - twine upload --repository-url $PYPRI_REPOSITORY_URL dist/* --verbose
+    - twine upload --repository-url --skip-existing $PYPRI_REPOSITORY_URL dist/* --verbose
   except:
     - tags
 
@@ -23,6 +23,6 @@ deploy_production:
     TWINE_USERNAME: $PRODUCTION_USERNAME
     TWINE_PASSWORD: $PRODUCTION_PASSWORD
   script:
-    - twine upload dist/* --verbose
+    - twine upload --skip-existing dist/* --verbose
   only:
     - tags
