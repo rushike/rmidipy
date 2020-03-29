@@ -911,6 +911,7 @@ class MIDI:
                         'type' : X[self.event_id >> 4]['name'],
                         'deltatime' : self.delta_time, 
                         'event_id' : self.event_id,
+                        'channel' : self.event_id & 0xF,
                         'time' : self.abstime,
                         'duration' : self.elength,
                         'is_drum' : False if (self.event_id & 0xF) != 10 else True,

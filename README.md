@@ -1,6 +1,6 @@
 # rmidipy
 This python library is intended to open midi files as python objects. Midi file is binary files, _list_ in form of tracks.
-Every _track_ contains sequence of __events__. Each __event__ is assosiated __*delta time*__, which refers to time from perivous 
+Every _track_ contains a sequence of __events__. Each __event__ is associated __*delta time*__, which refers to time from perivous 
 event, current event should occur.
 
 In same structure __*rmidi*__  has `MIDI` as base class, `MIDI.Track` for track representation and `MIDI.Track.Event` to represent each event.
@@ -9,6 +9,26 @@ In same structure __*rmidi*__  has `MIDI` as base class, `MIDI.Track` for track 
 ```cmd
     $ pip install rmidi
 ```
+**rmidi** has two classes for handling the midi files `MIDI` and `AbsoluteMidi`, further documentation reveals out their differences. 
+You can open `**.mid**` files with `MIDI` class only, which can transform to `AbsoluteMidi` class object
+
+### Opening and Creating the midi file
+```python
+>>> from rmidi.midi import MIDI
+>>> mid = MIDI.parse_midi(<midi-file-path>)
+>>> # do any manupulation it
+>>> mid.create_file(<midi-file-name>, <dir-path> = current-dir) # if dir is not specified file is store in current directory 
+```
+
+### Create **empty** Midi File
+```python
+>>> from rmidi.midi import MIDI
+>>> mid = MIDI(empty = True) # creates file with, format_type = 0, track_count = 0, time_div = 0x1e0
+>>> mid.create_file("empyty.mid")
+```
+
+
+
 
 ## MIDI 
 ```python
@@ -295,6 +315,12 @@ Absolute Midi is defined as its time from start, in seconds.
 </pre>
 </details>
 
+NoteSequence object is subscriptable, you can access, any note from praticular track easily.
+```python
+>>> event = ns[0][11] # this will give you the 11th event occured from 0th track
+>>> event = ns[0, 11] # this to is valid in numpy style
+```
+
 ### NoteSequence@`tostring`
 Converts the dict to pretty string
 ```python
@@ -503,7 +529,6 @@ It orders the events within track base on event attribute, order by is intended 
 >>> print(ordered) # Output for pitch sorted in reverse
 ```
 
-**Output**
 <details>
 <summary>Output</summary>
 <pre style = "height:40rem">

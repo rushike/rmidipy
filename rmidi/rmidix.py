@@ -1,15 +1,16 @@
 from rmidi import *
 import math, itertools
 from rmidi import mutils
-class Muse:
+import rmidi.math
 
+class Muse:
     def __init__(self, *args, **krgws):
         return
     
     def sequence(self, length, start = 0, sequence = 'fibonacci', modulo = 88, **kwargs):
         seq = [0] * length
         for i in range(length):
-            seq[i] = int(1 / math.sqrt(5) * (math.pow((1 + math.sqrt(5)) / 2, i + 1) - math.pow((1 - math.sqrt(5)) / 2, i + 1)))
+            seq[i] = rmidi.math.sequences.fibonacci(i)
             while 60 < seq[i] and seq[i] > 88: 
                 seq[i] += 48
                 seq[i] = seq[i] % modulo

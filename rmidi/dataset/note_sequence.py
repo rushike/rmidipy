@@ -5,10 +5,10 @@ from rmidi import AbsoluteMidi
 from rmidi.constant import converter
 
 import numpy, json, pickle
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 
 class NoteSequence:
-    def __init__(self, midi):
+    def __init__(self, midi, oftype = "list", value = True):
         """Makes rmidi object or midi file transfer to magenta.NoteSequence like object
         
         Arguments:
@@ -18,10 +18,13 @@ class NoteSequence:
             if midi.endswith(('.mid', '.midi')):
                 midi = abs(MIDI.parse_midi(midi))
             else : raise AttributeError(f"Attribute <midi> not a midi file path, path >> {midi}")
-            
-        # till here midi is translated to rmidi.MIDI or rmidi.AbsoluteMidi object
-        self.seq = NoteSequence.parse(midi)
-        
+            # till here midi is translated to rmidi.MIDI or rmidi.AbsoluteMidi object
+            self.seq = NoteSequence.parse(midi)
+        if isinstance(midi, dict):
+            self.seq = midi
+        self.list = tuple(map(lambda track: tuple(map( lambda event: event[1] if value else event, track[1].items())), self.seq.items()))
+        self.oftype = oftype
+        self.value = value
 
     @property
     def notes(self):
@@ -31,7 +34,7 @@ class NoteSequence:
             for j, event in track.items():
                 if event.get("type", "None") in ["note_on", "note_off"]:
                     seq[i][j] = self.seq[i][j]
-        return seq
+        return NoteSequence(seq)
 
     def order_by(self, attribute, reverse = False):
         """For now it support order by of only int or string attribute of event
@@ -43,9 +46,7 @@ class NoteSequence:
         seq = {}
         for i, track in ordered_notes.items():
             seq[i] = OrderedDict(sorted(track.items(), key = lambda x: x[1][attribute], reverse=reverse))
-        
-        print(f"dict : {seq}")
-        return seq
+        return NoteSequence(seq)
 
     def to_abs_midi(self):
         tracks = len(self)
@@ -78,6 +79,24 @@ class NoteSequence:
                     eventitem[1].items() )), trackitem[1].items()))} , seq.items()))
         return json.dumps(seqlist, indent=4, )
     
+    
+    def length(self, track):
+        return len(self[track])
+
+    def track(self, track):
+        return self.seq[track]
+    
+    def channel(self, track, channel_no):
+        return list(filter(lambda event: event["channel"] == channel_no, self.seq.tracks[track]))
+    
+    def __getitem__(self, index):
+        try:
+            if not isinstance(index, Iterable) : return self.list[index]           
+            track, event = index
+            return self.list[track][event]
+        except KeyError as K:
+            raise KeyError(f"Index Out of Bound, getting event, track of the midi  {K}")
+
     def __len__(self):
         return len(self.seq)
 
