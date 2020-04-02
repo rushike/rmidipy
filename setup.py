@@ -8,7 +8,7 @@ with open("requirements.txt", 'r') as req:
 
 setuptools.setup(
     name="rmidi",
-    version="0.0.31",
+    version="0.0.35",
     # scripts = ['MIDI.py', 'mutils.py', 'rmidi.py', 'sound.py'],
     packages= setuptools.find_packages(), # ['rmidi', 'rmidi.constant', 'rmidi.dataset'],
     author="rushike",
