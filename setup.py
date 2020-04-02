@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rushike/rmidipy",
-    install_requires=req_list,#['numpy'],
+    install_requires=['astroid==2.3.3', 'colorama==0.4.3', 'cycler==0.10.0', 'isort==4.3.21', 'kiwisolver==1.1.0', 'lazy-object-proxy==1.4.3', 'matplotlib==3.2.0', 'mccabe==0.6.1', 'numpy==1.18.1', 'pylint==2.4.4', 'pyparsing==2.4.6', 'python-dateutil==2.8.1', 'six==1.14.0', 'typed-ast==1.4.1', 'wrapt==1.11.2'],
     # packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
