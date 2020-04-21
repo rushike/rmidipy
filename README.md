@@ -27,17 +27,29 @@ You can open `**.mid**` files with `MIDI` class only, which can transform to `Ab
 >>> mid.create_file("empyty.mid")
 ```
 
-
-
+### Add **note on/off event** to track
+Below shows how to add any note to midi object, thing to note specifically here is every `note_on` event, there should always be `note_off` event. You can also disable `velocity`, to have note_off event
+```python
+>>> from rmidi.midi import MIDI
+>>> mid = MIDI(empty = True, track_count = 0) # creates file with, format_type = 0,  time_div = 0x1e0
+>>> mid.track(0).add_event(0, 'note_on', note_number = 60, velocity = 90, channel_no = 0) # add note with midi number 60 to track 0
+>>> mid.track(0).add_event(4, 'note_off' note_number = 60, velocity = 90, channel_no = 0) # there should be coressponding note-off event assosiated with note-on
+```
+Here `note_on` and `note_off` event has same parameter structure, and everything in specified above. 
+param structure `(time, event, note_number, velocity, channel_no)`.
+```js
+    time := delta time in traditional way of note presenting, as whole = 1, half = 2, quater = 4, and so on
+```
 
 ## MIDI 
 ```python
 >>> from rmidi import MIDI
 >>> y = MIDI.parse_midi(<midi_file_path>)
 ```
-
-**OUTPUT**
-```_____________________________________________________________________________________________________________________________ . . .
+<details>
+<summary>Output</summary>
+<pre style = "height:40rem">
+_____________________________________________________________________________________________________________________________ . . .
 | Absolute Time   |  Duration       |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
 |______________________________________________________________________________________________________________________________ . . .
 | 0.000000        | 0.000000        | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x0
@@ -67,7 +79,8 @@ You can open `**.mid**` files with `MIDI` class only, which can transform to `Ab
 | 0.000000        | 0.000000        | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x5
 | 0.000000        | 0.000000        | 0x71f       | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x0
 | 0.000000        | 0.000000        | 0x1         | META       | 0xff       | 0x2f  | 0x0        |
-```
+</pre>
+</details>
 
 ## Absolute midi
 Absolute Midi is defined as its time from start, in seconds.
@@ -78,9 +91,9 @@ Absolute Midi is defined as its time from start, in seconds.
 >>> yabs = AbsoluteMidi.to_abs_midi(y)
 >>> print(yabs)
 ```
-
-**OUTPUT**
-```
+<details>
+<summary>Output</summary>
+<pre style = "height:40rem">
 | Absolute Time   |  Duration       |  Note  Time         |  Delta Time |  ETYPE     |   Event ID | META  | LENGTH     | DATA
 |______________________________________________________________________________________________________________________________ . . .
 | 0.000000        | 0.000000        | 0                    | 0x0         | META       | 0xff       | 0x58  | 0x4        |  0x04  0x02 0x18  0x08
@@ -103,7 +116,9 @@ Absolute Midi is defined as its time from start, in seconds.
 | 233.333333      | 31.649306       | 1.0666666666666667   | 0x61        | CHANNEL    | 0x90       | 0     | 0x2        |  0x54  0x50
 | 0.000000        | 0.000000        | 0                    | 0x1         | META       | 0xff       | 0x2f  | 0x0        |
 *******************************************************************************************************************
-```
+</pre>
+</details>
+
 
 ## NoteSequence
 `rmidi.dataset.NoteSequence` is similar object to that of `Magenta.NoteSequence`, It holds everthing in dict, whole midi file is express as ***python nested dictionary***
@@ -323,11 +338,14 @@ NoteSequence object is subscriptable, you can access, any note from praticular t
 
 ### NoteSequence@`tostring`
 Converts the dict to pretty string
-```python
+<details>
+<summary>Input</summary>
+<pre style = "height:40rem">
 from rmidi.dataset import NoteSequence
 dict_ = {0: OrderedDict([(17, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 233.33333333333326, 'duaration': 31.649305555555543, 'pitch': 84, 'velocity': 80, 'is_drum': False}), (16, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 199.99999999999994, 'duaration': 31.649305555555543, 'pitch': 83, 'velocity': 80, 'is_drum': False}), (15, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 166.66666666666663, 'duaration': 31.649305555555543, 'pitch': 81, 'velocity': 80, 'is_drum': False}), (14, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 133.33333333333331, 'duaration': 31.649305555555543, 'pitch': 79, 'velocity': 80, 'is_drum': False}), (13, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 99.99999999999999, 'duaration': 31.649305555555557, 'pitch': 77, 'velocity': 80, 'is_drum': False}), (12, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 66.66666666666666, 'duaration': 31.649305555555557, 'pitch': 76, 'velocity': 80, 'is_drum': False}), (11, {'type': 'note_on', 'deltatime': 97, 'event_id': 144, 'time': 33.33333333333333, 'duaration': 31.649305555555557, 'pitch': 74, 'velocity': 80, 'is_drum': False}), (10, {'type': 'note_on', 'deltatime': 0, 'event_id': 144, 'time': 0.0, 'duaration': 31.649305555555554, 'pitch': 72, 'velocity': 80, 'is_drum': False})])}
 print(NoteSequence.tostring(dict_))
-``` 
+</pre>
+</details>
 <details>
 <summary>Output</summary>
 <pre style = "height:40rem">[
@@ -633,3 +651,8 @@ Convert `NoteSequece` to `AbsoluteMidi` object.
 ```
 <class 'rmidi.absolutemidi.AbsoluteMidi'>
 ```
+
+
+
+## Muse
+Basic class able to generate midi from sequence, with fixed or random time associated with each event.

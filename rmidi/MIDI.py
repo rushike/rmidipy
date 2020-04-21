@@ -613,12 +613,23 @@ class MIDI:
                     return [ne]
                 return res
 
-            # ind = ind1 if not ind1  else ind2 if not ind2  else None
-            # print("ind : From get_event --  ", ind)
-            # if not ind:
-            #     print("id_ : From get_event -- ", id_)
                 
-        def add_event(self, time, event, **kparams):#Can't add key sig event for now
+        def add_event(self, time, event, **kparams): #Can't add key sig event for now
+            """
+            Arguments:
+                time {int}  -- delta time, in ticks
+                event {str} -- event name, like note_on, note_off,.. etc 
+
+            Keyword Arguments:
+                channel_no {int} -- int < 16 specificing the midi channel (default : 0)
+                data {str | list | tuple} -- string, list, tuple data for event, specially for meta event
+                params {list | tuple} -- list, tuple specifies data for event, specially for channel event
+            Raises:
+                AttributeError: in case if in appropiate **kparams specified
+            
+            Returns:
+                [NoneType] -- return NoneType object
+            """
             if 'delta' in kparams:
                 pass
             else:
@@ -628,11 +639,11 @@ class MIDI:
                     # if event in itertools.chain(*constant.ch_event_format):
                     if ind:
                         evt_info = constant.ch_event_format[ind[0]]
-                        ch_no = kparams.get('channel_no') if 'channel_no' in kparams else 0
+                        ch_no = kparams.get('channel_no', 0)
                         event_id = (evt_info[0] << 4) | (ch_no & 7)
                         if 'params' in kparams:
                             params = kparams.get('params')
-                            if len(params) != evt_info[2]: raise ValueError("params length not matched to actual parameter")
+                            if len(params) != evt_info[2]: raise AttributeError("params length not matched to actual parameter")
                             pass
                         else:
                             params = [0] * evt_info[2]
@@ -640,7 +651,7 @@ class MIDI:
                                 if  evt_info[i] in kparams:
                                     params[i - 3] = kparams.get(evt_info[i])
                                     pass
-                                else: raise ValueError("Attribute " + evt_info[i] + " not in parameters")
+                                else: raise AttributeError("Attribute " + evt_info[i] + " not in parameters")
                         self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
                         return True
                     #Adding meta event    
@@ -657,11 +668,11 @@ class MIDI:
                             if 'text' in kparams:
                                 if type(kparams.get('text')) == str:
                                     params = kparams.get('text').encode('utf-8')
-                                else :raise ValueError("Event : " + event + " text attribute is nor string")
+                                else :raise AttributeError("Event : " + event + " text attribute is nor string")
                             elif 'data' in kparams:
                                 if type(kparams.get('data')) == str:
                                     params = kparams.get('data').encode('utf-8')
-                                else :raise ValueError("Event : " + event + " text attribute is nor string")
+                                else :raise AttributeError("Event : " + event + " text attribute is nor string")
                         elif evt_info[2] == 0: self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x2f, None)) #Meta Event : End of Track
                         else :
                             if evt_info[3+ evt_info[2]] == -1:
@@ -675,7 +686,7 @@ class MIDI:
                                 if evt_info[i] in kparams:
                                     params[i - 3] = kparams.get(evt_info[i]) % maxr[i]
                                     pass
-                                else : raise ValueError("Attribute " + evt_info[i] + " not in parameters")
+                                else : raise AttributeError("Attribute " + evt_info[i] + " not in parameters")
 
                         self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data=bytearray(params)))
 
@@ -683,7 +694,7 @@ class MIDI:
                     if event in itertools.chain(*constant.ch_event_format):
                         pass
                 else:
-                    raise ValueError("Inappropiate Arhument Value, event not of type string")
+                    raise AttributeError("Inappropiate Arhument Value, event not of type string")
 
 
             return None
@@ -721,17 +732,21 @@ class MIDI:
         def end_track(self):
             self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x2f, None))
         
-        def delta_time(self, note_length):#Computes the delta time from tradition note duration, full, half, quater 
+        def delta_time(self, note_length, kind = 'note'):#Computes the delta time from tradition note duration, full, half, quater 
             """ Computes the delta time from tradition note duration, full, half, quater 
             Assumes every midi file of 4 / 4 key sig for now 
             
             Arguments:
                 note_length {int} -- tradition note duration, full(1), half(2), quater(4)
+
+            Keyword Arguments:
+                kind {str}  -- string specifiying what is in note - length, one of ['note', 'tick', 'sec']
             Returns:
                 [int] -- delta_time
             """
             if not note_length: return 0
-            return (self.midi_.time_div * 4) // note_length
+            if kind == 'note': return (self.midi_.time_div * 4) // note_length
+            if kind == 'sec' : return 
         
         def leng(self):#Returns length in bytes
             szn = 0
