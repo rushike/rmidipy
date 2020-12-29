@@ -1,12 +1,13 @@
 from rmidi import mutils
 from rmidi import MIDI
 from rmidi import AbsoluteMidi
-from rmidi import rmidix
+from rmidi import muse
 from rmidi import analyser
 import numpy, random
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from rmidi.dataset import piano_roll
+from rmidi import tests
 '''
 MIDI Object Testing
 '''
@@ -328,5 +329,11 @@ def test_ns_to_rmidi(filepath = 'check.mid'):
     ns = NoteSequence(filepath)
     absmidi = ns.to_abs_midi()
     print(type(absmidi))
-test_ns_to_rmidi()
+# test_ns_to_rmidi()
+
+def test_muse(start, length, dtime = 1, filename = f'muse-{random.randint(0, 100)}', sequence = 'serial', oftype = 'melody'):
+    mu = muse.Muse(start, length, sequence, 1, kind = 'sec', filename = filename, oftype = oftype)
+    mu.generate()
+# test_muse(0, 128, 1, oftype='harmony')
 1 == 0
+

@@ -4,7 +4,7 @@ import os, os.path as pathmap
 from rmidi import mutils
 import itertools
 from rmidi.constant import converter
-import rmidi as constant
+from rmidi import constant
 from rmidi.constant import X
 
 numpy = np
@@ -47,7 +47,7 @@ def to_fix_length(k, leng, bits):
 def up(n_b, base = 2):
     return base ** int(math.log2(n_b) / math.log2(base) + 1)
     
-def split(n, t, block_size = None): #Splits 'n' integer in t integer of bits bit(n)/t
+def split(n, t, block_size = None): # Splits 'n' integer in t integer of bits bit(n)/t
     n_b = length(n)
     sbit = up(n_b) // t if not block_size else block_size
     WRAPPER = 2 ** sbit - 1
@@ -87,92 +87,38 @@ def find_location(text, listt):
     except StopIteration:
         return None
 
-class constant:
-    Mthd = (0x4d, 0x54, 0x68, 0x64)
-    Mtrk = (0x4d, 0x54, 0x72, 0x6b)
-    META_EVENT_END = (0x01, 0xff, 0x2f, 0x0)
-    MAX = 1048576
-    DTYPE = {'uint4': (0, 16), 'uint7': (0, 127), 'uint8' : (0, 256)}
-    CHANNEL_EVENT = 'CHANNEL'
-    META_EVENT = 'META'
-    SYS_EVENT = 'SYS'
-    #format = (id, sub_event_name, param_len, params..., param_type)
-    ch_event_format = (
-                        (0x8, "note_off", 2, "note_number", "velocity", "int"),
-                        (0x9, "note_on", 2, "note_number", "velocity", "int"),
-                        (0xA, "after_touch", 2, "note_number", "amount", "int"),
-                        (0xB, "controller", 2, "controller_type", "value", "int"),                   
-                        (0xC, "program_change", 1, "program_number", "int"),                   
-                        (0xD, "channel_after_touch", 1, "amount", "int"),                   
-                        (0xE, "pitch_bend", 2, "vlsb", "vmsb", "int")                  
-                    )
-    #format = (id, "sub_event_name", "param_len", params..., "param_type", "common_range, -1", //if -1, highest_allowed_val_of_param..., -1, "mask")
-    #If -1 in place of common range the following param len args are highesh values of parameters
-    #If all within mask positive else masked negative
-    meta_event_format = (
-                            (0x00, "sequence_number", 2, "nmsb", "nlsb", "int", 256),
-                            (0x01, "text_event", -1, "text", "str"),
-                            (0x02, "copyright_notice", -1, "text", "str"),
-                            (0x03, "track_name", -1, "text", "str"),
-                            (0x04, "instrument_name", -1, "text", "str"),
-                            (0x05, "lyrics", -1, "text", "str"),
-                            (0x06, "marker", -1, "text", "str"),
-                            (0x07, "cue_point", -1, "text", "str"),
-                            (0x20, "midi_ch_prefix", 1, "channel", "int", 16),
-							(0x21, "midi_port", 1, "port_no", "int", 16),
-                            (0x2F, "end_of_track", 0, None, "None"),
-                            (0x51, "set_tempo", 3, "musec_per_quat_note", "int", 8355712, 3),
-                            (0x54, "smpte_offset", 5, "hr", "min", "sec", "fr", "subfr", "int", -1, 24, 60, 60, 30, 100),
-                            (0x58, "time_sig", 4, "numer", "denom", "metro", "32nds", "int", 255),
-                            (0x59, "key_sig", 2, "key", "scale", "int" ,-1, 14, 2, -1, 7),
-                            (0x7F, "sequence_specifier", -1, "data", "any")
-                        )
-    sys_event_format = (
-                            (0xF0, "normal_sys_event", -1, "data", "int", 128),
-                            (0xF7, "authorization_sys_event", -1, "data", "int", 256),
-                            
-                        )
-
-    #controller format = (controller_value/id , "controller_type", "len_of_simmilar_extension")
-    controller = (
-                    (0x00, "blank_select", 1),
-                    (0x01, "modulation", 1),
-                    (0x02, "breath_controller", 1),
-                    (0x04, "foot_controller", 1),
-                    (0x05, "portamento_time", 1),
-                    (0x06, "data_entry", 1),#May be msb
-                    (0x07, "main_volume", 1),
-                    (0x08, "balance", 1),
-                    (0x0A, "pan", 1),
-                    (0x0B, "expression_controller", 1),
-                    (0x0C, "effect_control", 2),
-                    # (0x0D, "effect_control_2", 0),
-                    (0x10, "general_purpose_controller", 4, 0x50, 4),
-                    (0x20, "LSB_for_controller", 32),
-                    (0x40, "damper_pedal", 1),
-                    (0x41, "portamento", 1),
-                    (0x42, "sostenuto", 1),
-                    (0x43, "soft_pedal", 1),
-                    (0x44, "legato_footswitch", 1),
-                    (0x45, "hold2", 1),
-                    (0x46, "damper_pedal", 1),
-                    (0x47, "sound_controller", 10),
-                    (0x40, "damper_pedal", 1),
-                    (0x50, "post_general_purpose_controller", 4),
-                    (0x54, "portamento_control", 1),
-                    (0x5B, "effects_depth", 5),
-                    (0x60, "data_increment", 1),
-                    (0x61, "data_decrement", 1),
-                    (0x62, "nonreg_param_num_lsb", 1),
-                    (0x63, "nonreg_param_num_msb", 1),
-                    (0x64, "reg_param_num_lsb", 1),
-                    (0x65, "reg_param_num_msb", 1),
-                    (0x79, "mode_messages", 7),
-                )
-
 
 class MIDI:
-    def __init__(self,  format_type = 0, track_count = 0, time_div = 0x1e0, empty = False, filename = None, ):
+    def __init__(self,  format_type = 0, track_count = 1, time_div = 0x1e0, empty = False, filename = None, ):
+        """create midi object
+        time_div := This defines the default unit of delta-time for this MIDI file. This is a 16-bit binary value, MSB first. 
+            This may be in either of two formats, depending on the value of MSB bit.
+            ______________________________________________________________________________________
+            | Bit          | 15  |  14  13  12  11  10  09  08 | 07  06  05  04  03  02  01  00  |
+            |--------------|-----|-----------------------------|---------------------------------|
+            |              | 0   |                  ticks per quater note                        |
+            | time division|-----|-----------------------------|---------------------------------|
+            |              | 1   |-frames / second             |  ticks / frame                  |
+            |______________|_____|_____________________________|_________________________________|
+
+            bit 15 = 0:==
+                bits 0-14 ==> number of delta-time units in each a quarter-note.
+    
+            bit 15 = 1:
+                bits 0-7 ==> number of delta-time units per SMTPE frame
+                bits 8-14 ==> form a negative number, representing the number of SMTPE frames per second. Valid values correspond to those in the MTC Quarter Frame message.
+                    -24 (1100111) = 24 frames per second
+                    -25 (1100110) = 25 frames per second
+                    -29 (1100010) = 30 frames per second, drop frame
+                    -30 (1100001) = 30 frames per second, non-drop frame
+        
+        Keyword Arguments:
+            format_type {int} -- The MIDI file format. This is a 16-bit binary number, MSB first. valid [0 (single track), 1 (multi track), 2 (multiple independent track)](default: {0})
+            track_count {int} -- describes number of tracks in midi (default: {1})
+            time_div {hexadecimal} -- describes resolution of midi tick (default: {0x1e0})
+            empty {bool} -- wethere to create empty midi file, with empty tracks (default: {False})
+            filename {str} -- name of file to store midi on create midi (default: {None})
+        """
         self.pipe = {}
         self.filename = filename
         self.format_type = format_type
@@ -184,6 +130,7 @@ class MIDI:
     def track(self, track_no):#Indexing from Zero
         if self.track_count < track_no : raise IndexError("Track no out of range")
         return self.tracks[track_no]
+
     def set_time_div(self, val, inbpm = True): 
         """val acts as actual bpm value if inbpm is True, 
          or as no ticks per seconds count if inbpm is False
@@ -492,6 +439,10 @@ class MIDI:
             self.trk_event = [v for v in trk_event_copy]
             # print("Trak : ... ", self.trk_event)
             self.midi_ = midi_
+        
+        @property
+        def tempo(self):
+            return mutils.toint(self.get_event('set_tempo', depth = 100)[-1].data, 8)
 
         def _add_event(self, evt):
             end = self.trk_event.pop()
@@ -504,9 +455,6 @@ class MIDI:
         def set_tempo(self, time, tempo):
             tmp = ((500000 * 120) // tempo)
             self.add_event(0, 'set_tempo', tempo = tmp)
-
-        def tempo(self):
-            return mutils.toint(self.get_event('set_tempo', depth = 1)[0].data, 8)
 
         def transpose_to(self, scale, s_type = 0, offset = -256, new = False):
             self_copy = copy.deepcopy(self) if new else self
@@ -600,7 +548,7 @@ class MIDI:
             dep = 0
             if ind2:
                 id_ = constant.meta_event_format[ind2[0]][0]
-                event_info = constant.meta_event_format[0xFF][id_]
+                event_info = X[0xFF][id_]
                 # event_info = event_info['0xFF'][mutils.hex2(id_)]
                 for e in self.trk_event:
                     if e.meta_event_type == id_: 
@@ -621,15 +569,18 @@ class MIDI:
                 event {str} -- event name, like note_on, note_off,.. etc 
 
             Keyword Arguments:
-                channel_no {int} -- int < 16 specificing the midi channel (default : 0)
-                data {str | list | tuple} -- string, list, tuple data for event, specially for meta event
-                params {list | tuple} -- list, tuple specifies data for event, specially for channel event
+                channel_no {int}          --  int < 16 specificing the midi channel (default : {0})
+                kind {str}                --  string representing deltatime encoding (default : {tick})
+                data {str | list | tuple} --  string, list, tuple data for event, specially for meta event
+                params {list | tuple}     --  list, tuple specifies data for event, specially for channel event
             Raises:
                 AttributeError: in case if in appropiate **kparams specified
             
             Returns:
                 [NoneType] -- return NoneType object
             """
+            
+            timeticks = self.delta_time(time, kind=kparams.get('kind', 'tick'))
             if 'delta' in kparams:
                 pass
             else:
@@ -652,7 +603,7 @@ class MIDI:
                                     params[i - 3] = kparams.get(evt_info[i])
                                     pass
                                 else: raise AttributeError("Attribute " + evt_info[i] + " not in parameters")
-                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
+                        self._add_event(MIDI.Track.Event(delta_time=  timeticks, etype= constant.CHANNEL_EVENT, event_id= event_id, data=bytearray(params)))
                         return True
                     #Adding meta event    
                     ind = find_location(event, constant.meta_event_format)
@@ -661,8 +612,8 @@ class MIDI:
                         event_id = 0xff
                         meta_event_type = evt_info[0]
                         if event == 'set_tempo':
-                            a, b, c = split(kparams.get('tempo'), 3, 8)
-                            self._add_event(MIDI.Track.Event(delta_time=self.delta_time(time), etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data= bytearray((a, b, c))))
+                            a, b, c = split(kparams.get('tempo', 500000), 3, 8)
+                            self._add_event(MIDI.Track.Event(delta_time= timeticks, etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data= bytearray((a, b, c))))
                             return
                         if evt_info[2] == -1:
                             if 'text' in kparams:
@@ -688,7 +639,7 @@ class MIDI:
                                     pass
                                 else : raise AttributeError("Attribute " + evt_info[i] + " not in parameters")
 
-                        self._add_event(MIDI.Track.Event(delta_time= self.delta_time(time), etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data=bytearray(params)))
+                        self._add_event(MIDI.Track.Event(delta_time=  timeticks, etype= constant.META_EVENT, event_id= event_id, meta_event_type= meta_event_type, data=bytearray(params)))
 
                         pass
                     if event in itertools.chain(*constant.ch_event_format):
@@ -733,22 +684,39 @@ class MIDI:
             self.trk_event.append(MIDI.Track.Event.MetaEvent(0, 0x2f, None))
         
         def delta_time(self, note_length, kind = 'note'):#Computes the delta time from tradition note duration, full, half, quater 
-            """ Computes the delta time from tradition note duration, full, half, quater 
+            """ Computes the delta time from tradition note duration, full, half, quater, or from seconds if kind == 'sec' 
             Assumes every midi file of 4 / 4 key sig for now 
             
+            kind := 
+                note :== delta time from tradition note duration, full, half, quater 
+                    full    (1 / 1)  ==> 32
+                    half    (1 / 2)  ==> 16
+                    quarter (1 / 4)  ==> 8
+                    ...
+                    ..
+                    and so on
+                    in between values are also allowed
+                sec :== time in secs, converted to ticks using tempo and time-division
+                              note-length * 1e6 * time-division
+                    ticks = -------------------------------------
+                                          tempo
+                    here tempo is in number of microseconds per quarter beat, so the factor 1e6 is included
+
             Arguments:
                 note_length {int} -- tradition note duration, full(1), half(2), quater(4)
 
             Keyword Arguments:
                 kind {str}  -- string specifiying what is in note - length, one of ['note', 'tick', 'sec']
+
             Returns:
                 [int] -- delta_time
             """
             if not note_length: return 0
-            if kind == 'note': return (self.midi_.time_div * 4) // note_length
-            if kind == 'sec' : return 
+            if kind == 'note' : return ((self.midi_.time_div * note_length ) // constant.QUARTER_LENGTH)
+            if kind == 'sec'  : return int(note_length * (1e6 / self.tempo) * self.midi_.time_div) # self.tempo is in microseconds,  
+            if kind == 'tick' : return note_length
         
-        def leng(self):#Returns length in bytes
+        def leng(self): # Returns length in bytes
             szn = 0
             for e in self.trk_event:
                 szn += e.leng()

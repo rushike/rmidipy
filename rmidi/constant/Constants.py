@@ -24,6 +24,29 @@ SCALE_OFFSET =  {'c-major' : 0, 'c#-major' : 1, 'd-major' : 2, 'd#-major' : 3,'e
 
 
 """
+DELTA_TIME NOTE_LENGTH ENCODING
+    full    (1 / 1)  ==> 64
+    half    (1 / 2)  ==> 32
+    quarter (1 / 4)  ==> 16
+    ...
+    ..
+    and so on
+"""
+
+QUARTER_LENGTH = 16
+
+DELTA_TIME_NOTE_LENGTH = {
+                            'full'          : 64,
+                            'half'          : 32,
+                            'quater'        : 16,
+                            'eighth'        : 8,
+                            'sixteenth'     : 4,
+                            'thirty-second' : 2,
+                            'sixty-fourth'  : 1,
+                            'double-whole'  : 128
+                            }
+
+"""
 KEY_SIG ENCODING
 Everything according to circle of fifth
 no. of #'s  0 -> 7
@@ -135,7 +158,7 @@ controller = (
             )
 
 
-ch_event_format = {
+ch_event_format_dict = {
     8: {'id': 8,
         'length': 2,
         'mask': 127,

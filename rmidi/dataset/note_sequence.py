@@ -5,7 +5,8 @@ from rmidi import AbsoluteMidi
 from rmidi.constant import converter
 
 import numpy, json, pickle
-from collections import OrderedDict, Iterable
+from collections.abc import Iterable
+from collections import OrderedDict
 
 class NoteSequence:
     def __init__(self, midi, oftype = "list", value = True):
@@ -36,13 +37,46 @@ class NoteSequence:
                     seq[i][j] = self.seq[i][j]
         return NoteSequence(seq)
 
+    def pitches(self, track, all = True):
+        seq = {}
+        for i, track_ in self.seq.items():
+            if not all and track != i: continue
+            seq[i] = []
+            for j, event in track_.items():
+                if event.get("type", "None") in ["note_on"]:
+                    seq[i].append(self.seq[i][j]["pitch"])
+        if not all: return seq[track]
+        return seq
+    
+    def note_time(self, track = None, all = True):
+        seq = {}
+        for i, track_ in self.seq.items():
+            if track and track != i: continue
+            seq[i] = []
+            for j, event in track_.items():
+                if event.get("type", "None") in ["note_on"]:
+                    seq[i].append((self.seq[i][j]["pitch"], self.seq[i][j]["time"]))
+        if track: return seq[track]
+        return seq
+    
+    def note_intervals(self, track = None, all = True):
+        seq = {}
+        for i, track_ in self.seq.items():
+            if track and track != i: continue
+            seq[i] = []
+            for j, event in track_.items():
+                if event.get("type", "None") in ["note_on"]:
+                    seq[i].append((self.seq[i][j]["pitch"], self.seq[i][j]["duration"]))
+        if isinstance(track, int) and track > -1 : return seq[track]
+        return seq
+
     def order_by(self, attribute, reverse = False):
         """For now it support order by of only int or string attribute of event
         order by is intended to work for attributes 'time', 'duration', 'pitch', deltatime
         Arguments:
             attribute {str} -- attribute name
         """
-        ordered_notes = self.notes
+        ordered_notes = self.pitches(0)
         seq = {}
         for i, track in ordered_notes.items():
             seq[i] = OrderedDict(sorted(track.items(), key = lambda x: x[1][attribute], reverse=reverse))

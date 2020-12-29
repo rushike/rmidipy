@@ -7,4 +7,10 @@ build
 rmidi.egg-info
 *.tans
 *.mid
+*.png
+*.psd
+*.jpg
+*.webp
+*.mp3
+*.psd
 .pypirc
