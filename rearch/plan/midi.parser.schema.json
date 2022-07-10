@@ -1,0 +1,184 @@
+{
+    "version" : "1.0.0",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id" : "root",
+    "type" : "object",
+    "$comment": "Declare root schema of MIDI file, i.e. MThd chunk",
+    "description": "This schema will primary use by rmidi MIDI parser",
+    "title" : "MidiChunk",
+    "properties": {
+        "chunk_type" :{
+            "type" : "string",
+            "const" : "MThd"
+        },
+        "length" : {
+            "type" : "number",
+            "const" : 6
+        },
+        "format" : {
+            "type" : "object",
+            "title": "MidiBlock",
+            "description": "describes the format of midi file, i.e. single track, multi track or multi independent tracks",
+            "properties": {
+                "order" : {
+                    "const" : 1
+                },
+                "name" : {
+                    "type" : "string"
+                },
+                "value" : {
+                    "enum": [0, 1, 2]
+                },
+                "length" : {
+                    "type" : "number",
+                    "const" : 2
+                }
+            }
+        },
+        "ntrks" : {
+            "type" : "object",
+            "title": "MidiBlock",
+            "description": "describes the number of track in midi file",
+            "properties": {
+                "order" : {
+                    "const" : 2
+                },
+                "value" : {
+                    "type" : "number"
+                },
+                "length" : {
+                    "type" : "number",
+                    "const" : 2
+                }
+            }
+        },
+        "division" : {
+            "type" : "object",
+            "description": "describes the number of track in midi file",
+            "title": "MidiBlock",
+            "properties": {
+                "order" : {
+                    "const" : 3
+                },
+                "dtype" : {
+                    "type" : "object",
+                    "properties": {
+                        "value" : {
+                            "enum": [0, 1]
+                        },
+                        "startbit" : {
+                            "const" : 15
+                        },
+                        "endbit" : {
+                            "const" : 16
+                        }
+                    }
+                },
+                "value" : {
+                    "anyOf": [
+                        {
+                            "type" : "object",
+                            "properties": {
+                                "dtype" : {
+                                    "type" : "object",
+                                    "properties": {
+                                        "value" : {
+                                            "const" : 0
+                                        },
+                                        "startbit" : {
+                                            "const" : 15
+                                        },
+                                        "endbit" : {
+                                            "const" : 16
+                                        } 
+                                    }
+                                },
+                                "quaternoteticks" : {
+                                    "type" : "object",
+                                    "description": "ticks per quater for delta-time",
+                                    "properties": {
+                                        "value" : {
+                                            "type" : "number"
+                                        },
+                                        "startbit" : {
+                                            "const" : 0
+                                        },
+                                        "endbit" : {
+                                            "const" : 15
+                                        } 
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type" : "object",
+                            "properties": {
+                                "dtype" : {
+                                    "type" : "object",
+                                    "properties": {
+                                        "value" : {
+                                            "const" : 1
+                                        },
+                                        "startbit" : {
+                                            "const" : 15
+                                        },
+                                        "endbit" : {
+                                            "const" : 16
+                                        } 
+                                    }
+                                },
+                                "nSMPTE" : {
+                                    "type" : "object",
+                                    "description": "negative SMPTE, number of frames per second. Stored in 2's complement form",
+                                    "properties": {
+                                        "value" : {
+                                            "type" : "number",
+                                            "enum": [-24, -25, -29, -30]
+                                        },
+                                        "startbit" : {
+                                            "const" : 8
+                                        },
+                                        "endbit" : {
+                                            "const" : 15
+                                        } 
+                                    }
+                                },
+                                "frameticks" : {
+                                    "type" : "object",
+                                    "description": "ticks per frame",
+                                    "properties": {
+                                        "value" : {
+                                            "type" : "number"
+                                        },
+                                        "startbit" : {
+                                            "const" : 0
+                                        },
+                                        "endbit" : {
+                                            "const" : 8
+                                        } 
+                                    }
+                                }
+                            }
+                        }
+
+                    ]
+                },
+                "length" : {
+                    "type" : "number",
+                    "const" : 2
+                }
+            }
+        },
+        "tracks" : {
+            "type" : "array",
+            "title": "MidiChunk",
+            "properties": {
+                "chunk_type" :{
+                    "type" : "string",
+                    "const" : "MTrk"
+                },
+            }
+        }
+        
+    }
+}
