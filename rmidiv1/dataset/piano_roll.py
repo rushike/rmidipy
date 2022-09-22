@@ -1,8 +1,8 @@
-from rmidi.dataset import config
-from rmidi import mutils
-from rmidi import MIDI
-from rmidi import AbsoluteMidi
-from rmidi.constant import converter
+from rmidiv1.dataset import config
+from rmidiv1 import mutils
+from rmidiv1 import MIDI
+from rmidiv1 import AbsoluteMidi
+from rmidiv1.constant import converter
 import numpy
 
 class PianoRoll:

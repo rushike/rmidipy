@@ -1,7 +1,7 @@
-from rmidi import *
+from rmidiv1 import *
 import math, itertools
-from rmidi import mutils
-from rmidi.math import generator
+from rmidiv1 import mutils
+from rmidiv1.math import generator
 
 class Muse:
     def __init__(self, start, length, sequence, dtime, **kwargs):

@@ -4,8 +4,8 @@ import bm3d
 from matplotlib import pyplot as plt
 import pprint
 import os
-import rmidi
-from rmidi.muse import Muse
+import rmidiv1
+from rmidiv1.muse import Muse
 
 
 def get_image_edges(filepath, inverse = False, plot = True, filename = "default.png"):
@@ -68,7 +68,7 @@ def img_to_midi(filepath, name = "default", edge = True, offset = 0, threshold =
     plt.imshow(img, cmap='gray')
     prev_high_indexes = set() # set of notes that are pressed
     midi_notes_sequence = []
-    mid = rmidi.MIDI()
+    mid = rmidiv1.MIDI()
     notes_time = numpy.zeros(128, dtype = "int32")
     delta = 0
     plt.imshow(img, cmap='gray')

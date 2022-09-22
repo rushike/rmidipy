@@ -1,7 +1,7 @@
-from rmidi.dataset import config
-from rmidi import mutils
-from rmidi.MIDI import MIDI
-from rmidi.absolutemidi import AbsoluteMidi
+from rmidiv1.dataset import config
+from rmidiv1 import mutils
+from rmidiv1.MIDI import MIDI
+from rmidiv1.absolutemidi import AbsoluteMidi
 
 class reader():
     def __init__(self, dataset_path = config.PATH):

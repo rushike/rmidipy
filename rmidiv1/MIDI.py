@@ -1,11 +1,11 @@
 import math, random, copy
 import numpy as np 
 import os, os.path as pathmap
-from rmidi import mutils
+from rmidiv1 import mutils
 import itertools
-from rmidi.constant import converter
-from rmidi import constant
-from rmidi.constant import X
+from rmidiv1.constant import converter
+from rmidiv1 import constant
+from rmidiv1.constant import X
 
 numpy = np
 
@@ -369,7 +369,7 @@ class MIDI:
             pass
     
     def __abs__(self):
-        from rmidi import AbsoluteMidi
+        from rmidiv1 import AbsoluteMidi
         return AbsoluteMidi.to_abs_midi(self)
     
     def __len__(self):

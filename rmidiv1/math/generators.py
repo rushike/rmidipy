@@ -1,4 +1,4 @@
-from rmidi.math import functions
+from rmidiv1.math import functions
 
 
 def fibonacci(start, end = None, step = 1):

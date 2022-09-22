@@ -1,8 +1,8 @@
-from rmidi import MIDI
-from rmidi import constant
-from rmidi.constant import *
+from rmidiv1 import MIDI
+from rmidiv1 import constant
+from rmidiv1.constant import *
 import copy
-from rmidi import mutils
+from rmidiv1 import mutils
 class AbsoluteMidi(MIDI):
     def __init__(self, format_type=0, track_count=0, time_div=480, empty=False, filename=None, tempo = 500000):
         super().__init__(format_type=format_type, track_count=track_count, time_div=time_div, empty=empty, filename=filename) # no tempo change assumed glich

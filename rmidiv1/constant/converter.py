@@ -1,4 +1,4 @@
-from rmidi.constant import Constants
+from rmidiv1.constant import Constants
 import os
 import json
 def dict_to_event_json(filename, dictn):

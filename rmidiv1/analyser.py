@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-from rmidi import MIDI, constant
-from rmidi.mutils import channel as mchannel
-from rmidi import mutils
-from rmidi import AbsoluteMidi
-from rmidi.constant import converter
+from rmidiv1 import MIDI, constant
+from rmidiv1.mutils import channel as mchannel
+from rmidiv1 import mutils
+from rmidiv1 import AbsoluteMidi
+from rmidiv1.constant import converter
 import glob, os
 import numpy
 # import music21

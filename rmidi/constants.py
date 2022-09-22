@@ -1,0 +1,4 @@
+BIG_ENDIAN = "big"
+LITTLE_ENDIAN = "little"
+
+MIDI_HEADER = "MThd"
