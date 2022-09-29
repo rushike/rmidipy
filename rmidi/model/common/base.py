@@ -23,3 +23,6 @@ class BaseByte:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
+    def parse(self, Parser):
+        return Parser(self).parse()
+

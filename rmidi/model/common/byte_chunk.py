@@ -18,7 +18,4 @@ class ByteChunk (BaseByte) :
         self.block = block
         self.reader = BufferReader(content = content)
 
-    def parse(self, Parser):
-        return Parser(self).parse()
-
     

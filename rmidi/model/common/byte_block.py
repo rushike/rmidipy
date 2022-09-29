@@ -7,12 +7,14 @@ from rmidi.model.common.base import BaseByte
 
 
 class ByteBlock (BaseByte) : 
-    def __init__(self):
-        self.content = None
-        self.length = None
-
-    
-    def load(self, length, content):
+    def __init__(self, length, content, **kwargs):
         self.content = content
         self.length = length
+        self.kwargs = kwargs
+
+    
+    def load(self, length, content, **kwargs):
+        self.content = content
+        self.length = length
+        self.kwargs = kwargs
         
