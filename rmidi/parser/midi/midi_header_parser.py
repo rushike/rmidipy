@@ -11,7 +11,7 @@ class MidiHeaderParser(MidiParser):
     """
     def __init__(self, o) -> None:
         super().__init__(o)
-        # self.o = o
+
     def parse_division(self, bytearr = bytes([0x01, 0xe0])):
         if len(bytearr) != 2: raise AttributeError( f"Passed invalid attribute, bytearr : {bytearr}")
         if bytearr[0] & 0x7f == 0x7f : #  SMPTE and MIDI Time Code. 

@@ -61,8 +61,8 @@ class MIDI (Parser):
             if block["name"] == "header" :
                 midi = Midi(self.parse_header())
             elif block["name"] == "tracks" :
-                self.parse_tracks()
-        return midi
+                track = self.parse_tracks()
+        return midi.add_track(track)
 
     @classmethod
     def fromfile(cls, filepath) :

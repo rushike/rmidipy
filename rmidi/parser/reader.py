@@ -22,7 +22,14 @@ class Reader:
         except Exception as e:
             self.iter -= length
             raise EOFError(f"No more bytes to read. Can't read {length} number of bytes")
-
+    
+    def head(self, length = 4, one = False): # return raw byte array
+        try : 
+            if length == 1 and one: return self.content[self.iter]
+            else : return self.content[self.iter: self.iter + length]
+        except Exception as e:
+            raise EOFError(f"No more bytes to read. Can't read {length} number of bytes")
+    
     def at(self, start = 0, length = 4):
         try :
             return self.content[start : start + length]
@@ -37,6 +44,27 @@ class Reader:
         if (type(arr) == int) : arr = self.next(arr)
         intnumber = self.masked(arr, mask)
         return int.from_bytes(intnumber, format, signed=signed)
+
+    def getbytes(self, bytearr = None, cntrl = 8, set = True):
+        """It will return bytes till when control bit is same as specified (set [1] or unset[0])
+
+        Args:
+            bytearr (_type_, optional): bytes to search. Defaults to None.
+            cntrl (int, optional): cntrl bit. Defaults to 8.
+        """
+        if not bytearr : 
+            bytearr = self.content
+            iter = self.iter
+        else : iter = 0
+        CNTRL_MASK = (1 << cntrl ) if set else 0
+        
+        try :
+            while ( bytearr[iter] & CNTRL_MASK ) == CNTRL_MASK:
+                iter += 1
+            self.iter += iter
+            return bytearr[self.iter - iter : self.iter]
+        except:
+            raise AttributeError("INVALID")
     
     def varlennumber(self, bytearr = None, bits = 7, format = BIG_ENDIAN) -> int:
         """It will return the variable length number stored
@@ -65,8 +93,10 @@ class Reader:
         NUM_MASK = (1 << bits) - 1 # it will extract number from bits stored
         SET_MASK = 1 << bits # it will extract info of control bit
         num = 0x00
+
         try:
             while True:
+                # print("iter : ", hex(self.iter))
                 if format == LITTLE_ENDIAN:
                     num = num | ((bytearr[self.iter] & NUM_MASK) << bits)
                 elif format == BIG_ENDIAN:

@@ -9,3 +9,8 @@ class MidiEvent (BaseModel):
         self.eventtype = eventtype
         self.content = content
         self.kwargs = kwargs
+        self.setkwargsattrs()
+
+    def setkwargsattrs(self):
+        for key, value in self.kwargs.items():
+            setattr(self, key, value)

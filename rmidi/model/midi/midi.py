@@ -9,5 +9,6 @@ class Midi (BaseModel):
 
     def add_track(self, track):
         self.tracks.append(track)
+        return self
 
     
